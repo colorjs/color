@@ -1,485 +1,442 @@
-/* MIT license */
-var convert = require("color-space"),
-    string = require("color-string");
-
-var Color = function(cssString) {
-  if (cssString instanceof Color) return cssString;
-  if (! (this instanceof Color)) return new Color(cssString);
-
-   // actual values
-   this.values = [0,0,0];
-   this._alpha = 1;
-
-   //keep actual space reference
-   this.space = 'rgb';
-
-
-   // parse Color() argument
-   //[0,0,0]
-   if (cssString instanceof Array) {
-      this.values = cssString;
-   }
-   //rgb(0,0,0)
-   else if (typeof cssString == "string") {
-      var vals = string.getRgba(cssString);
-      if (vals) {
-         this.setValues("rgb", vals);
-      }
-      else if(vals = string.getHsla(cssString)) {
-         this.setValues("hsl", vals);
-      }
-      else if(vals = string.getHwb(cssString)) {
-         this.setValues("hwb", vals);
-      }
-      else {
-        throw new Error("Unable to parse color from string \"" + cssString + "\"");
-      }
-   }
-   //{r:0, g:0, b:0}
-   else if (typeof cssString == "object") {
-      var vals = cssString;
-      if(vals["r"] !== undefined || vals["red"] !== undefined) {
-         this.setValues("rgb", vals)
-      }
-      else if(vals["l"] !== undefined || vals["lightness"] !== undefined) {
-         this.setValues("hsl", vals)
-      }
-      else if(vals["v"] !== undefined || vals["value"] !== undefined) {
-         this.setValues("hsv", vals)
-      }
-      else if(vals["w"] !== undefined || vals["whiteness"] !== undefined) {
-         this.setValues("hwb", vals)
-      }
-      else if(vals["c"] !== undefined || vals["cyan"] !== undefined) {
-         this.setValues("cmyk", vals)
-      }
-      else {
-        throw new Error("Unable to parse color from object " + JSON.stringify(cssString));
-      }
-   }
-};
-
-Color.prototype = {
-   rgb: function (vals) {
-      return this.setSpace("rgb", arguments);
-   },
-   hsl: function(vals) {
-      return this.setSpace("hsl", arguments);
-   },
-   hsv: function(vals) {
-      return this.setSpace("hsv", arguments);
-   },
-   hwb: function(vals) {
-      return this.setSpace("hwb", arguments);
-   },
-   cmyk: function(vals) {
-      return this.setSpace("cmyk", arguments);
-   },
-
-   rgbArray: function() {
-      this.actualizeSpace('rgb');
-      return this.values.slice();
-   },
-   hslArray: function() {
-      this.actualizeSpace('hsl');
-      return this.values.slice();
-   },
-   hsvArray: function() {
-      this.actualizeSpace('hsv');
-      return this.values.slice();
-   },
-   hwbArray: function() {
-      this.actualizeSpace('hwb');
-      var hwb = this.values.slice()
-      if (this._alpha !== 1) {
-        return hwb.concat(this._alpha);
-      }
-      return hwb;
-   },
-   cmykArray: function() {
-      this.actualizeSpace('cmyk');
-      return this.values.slice();
-   },
-   rgbaArray: function() {
-      this.actualizeSpace('rgb');
-      var rgb = this.values.slice();
-      return rgb.concat(this._alpha);
-   },
-   hslaArray: function() {
-      this.actualizeSpace('hsl');
-      var hsl = this.values.slice();
-      return hsl.concat(this._alpha);
-   },
-   alpha: function(val) {
-      if (val === undefined) {
-         return this._alpha;
-      }
-      this.setValues("alpha", val);
-      return this;
-   },
-
-   red: function(val) {
-      return this.setChannel("rgb", 0, val);
-   },
-   green: function(val) {
-      return this.setChannel("rgb", 1, val);
-   },
-   blue: function(val) {
-      return this.setChannel("rgb", 2, val);
-   },
-   hue: function(val) {
-      return this.setChannel("hsl", 0, val);
-   },
-   saturation: function(val) {
-      return this.setChannel("hsl", 1, val);
-   },
-   lightness: function(val) {
-      return this.setChannel("hsl", 2, val);
-   },
-   saturationv: function(val) {
-      return this.setChannel("hsv", 1, val);
-   },
-   whiteness: function(val) {
-      return this.setChannel("hwb", 1, val);
-   },
-   blackness: function(val) {
-      return this.setChannel("hwb", 2, val);
-   },
-   value: function(val) {
-      return this.setChannel("hsv", 2, val);
-   },
-   cyan: function(val) {
-      return this.setChannel("cmyk", 0, val);
-   },
-   magenta: function(val) {
-      return this.setChannel("cmyk", 1, val);
-   },
-   yellow: function(val) {
-      return this.setChannel("cmyk", 2, val);
-   },
-   black: function(val) {
-      return this.setChannel("cmyk", 3, val);
-   },
-
-   hexString: function() {
-      this.actualizeSpace('rgb');
-      return string.hexString(this.values);
-   },
-   rgbString: function() {
-      this.actualizeSpace('rgb');
-      return string.rgbString(this.values, this._alpha);
-   },
-   rgbaString: function() {
-      this.actualizeSpace('rgb');
-      return string.rgbaString(this.values, this._alpha);
-   },
-   percentString: function() {
-      this.actualizeSpace('rgb');
-      return string.percentString(this.values, this._alpha);
-   },
-   hslString: function() {
-      this.actualizeSpace('hsl');
-      return string.hslString(this.values, this._alpha);
-   },
-   hslaString: function() {
-      this.actualizeSpace('hsl');
-      return string.hslaString(this.values, this._alpha);
-   },
-   hwbString: function() {
-      this.actualizeSpace('hwb');
-      return string.hwbString(this.values, this._alpha);
-   },
-
-   keyword: function() {
-      this.actualizeSpace('rgb');
-      return string.keyword(this.values, this._alpha);
-   },
-
-   rgbNumber: function() {
-      this.actualizeSpace('rgb');
-      return (this.values[0] << 16) | (this.values[1] << 8) | this.values[2];
-   },
-
-   luminosity: function() {
-      // http://www.w3.org/TR/WCAG20/#relativeluminancedef
-      this.actualizeSpace('rgb');
-      var rgb = this.values;
-      var lum = [];
-      for (var i = 0; i < rgb.length; i++) {
-         var chan = rgb[i] / 255;
-         lum[i] = (chan <= 0.03928) ? chan / 12.92
-                  : Math.pow(((chan + 0.055) / 1.055), 2.4)
-      }
-      return 0.2126 * lum[0] + 0.7152 * lum[1] + 0.0722 * lum[2];
-   },
-
-   contrast: function(color2) {
-      // http://www.w3.org/TR/WCAG20/#contrast-ratiodef
-      var lum1 = this.luminosity();
-      var lum2 = color2.luminosity();
-      if (lum1 > lum2) {
-         return (lum1 + 0.05) / (lum2 + 0.05)
-      };
-      return (lum2 + 0.05) / (lum1 + 0.05);
-   },
-
-   level: function(color2) {
-     var contrastRatio = this.contrast(color2);
-     return (contrastRatio >= 7.1)
-       ? 'AAA'
-       : (contrastRatio >= 4.5)
-        ? 'AA'
-        : '';
-   },
-
-   dark: function() {
-      // YIQ equation from http://24ways.org/2010/calculating-color-contrast
-      this.actualizeSpace('rgb');
-      var rgb = this.values,
-          yiq = (rgb[0] * 299 + rgb[1] * 587 + rgb[2] * 114) / 1000;
-      return yiq < 128;
-   },
-
-   light: function() {
-      return !this.dark();
-   },
-
-   negate: function() {
-      this.actualizeSpace('rgb');
-      var rgb = [];
-      for (var i = 0; i < 3; i++) {
-         rgb[i] = 255 - this.values[i];
-      }
-      this.setValues("rgb", rgb);
-      return this;
-   },
-
-   lighten: function(ratio) {
-      this.actualizeSpace('hsl');
-      this.values[2] += this.values[2] * ratio;
-      this.setValues("hsl", this.values);
-      return this;
-   },
-
-   darken: function(ratio) {
-      this.actualizeSpace('hsl');
-      this.values[2] -= this.values[2] * ratio;
-      this.setValues("hsl", this.values);
-      return this;
-   },
-
-   saturate: function(ratio) {
-      this.actualizeSpace('hsl');
-      this.values[1] += this.values[1] * ratio;
-      this.setValues("hsl", this.values);
-      return this;
-   },
-
-   desaturate: function(ratio) {
-      this.actualizeSpace('hsl');
-      this.values[1] -= this.values[1] * ratio;
-      this.setValues("hsl", this.values);
-      return this;
-   },
-
-   whiten: function(ratio) {
-      this.actualizeSpace('hwb');
-      this.values[1] += this.values[1] * ratio;
-      this.setValues("hwb", this.values);
-      return this;
-   },
-
-   blacken: function(ratio) {
-      this.actualizeSpace('hwb');
-      this.values[2] += this.values[2] * ratio;
-      this.setValues("hwb", this.values);
-      return this;
-   },
-
-   greyscale: function() {
-      this.actualizeSpace('rgb');
-      var rgb = this.values;
-      // http://en.wikipedia.org/wiki/Grayscale#Converting_color_to_grayscale
-      var val = rgb[0] * 0.3 + rgb[1] * 0.59 + rgb[2] * 0.11;
-      this.setValues("rgb", [val, val, val]);
-      return this;
-   },
-
-   clearer: function(ratio) {
-      this.setValues("alpha", this._alpha - (this._alpha * ratio));
-      return this;
-   },
-
-   opaquer: function(ratio) {
-      this.setValues("alpha", this._alpha + (this._alpha * ratio));
-      return this;
-   },
-
-   rotate: function(degrees) {
-      this.actualizeSpace('hsl');
-      var hue = this.values[0];
-      hue = (hue + degrees) % 360;
-      hue = hue < 0 ? 360 + hue : hue;
-      this.values[0] = hue;
-      this.setValues("hsl", this.values);
-      return this;
-   },
-
-   mix: function(color2, weight, space) {
-      space = space || 'rgb';
-
-      this.actualizeSpace(space);
-      color2.actualizeSpace(space);
-
-      weight = 1 - (weight == null ? 0.5 : weight);
-
-      // algorithm from Sass's mix(). Ratio of first color in mix is
-      // determined by the alphas of both colors and the weight
-      var t1 = weight * 2 - 1,
-          d = this.alpha() - color2.alpha();
-
-      var weight1 = (((t1 * d == -1) ? t1 : (t1 + d) / (1 + t1 * d)) + 1) / 2;
-      var weight2 = 1 - weight1;
-
-      var vals = this.values;
-      var vals2 = color2.values;
-
-      for (var i = 0; i < vals.length; i++) {
-         vals[i] = vals[i] * weight1 + vals2[i] * weight2;
-      }
-      this.setValues(space, vals);
-
-      var alpha = this.alpha() * weight + color2.alpha() * (1 - weight);
-      this.setValues("alpha", alpha);
-
-      return this;
-   },
-
-   toJSON: function() {
-     return this.rgb();
-   },
-
-   clone: function() {
-     return new Color(this.rgbArray());
-   },
-
-   //somewhat generic getters
-   toArray: function(){
-      var vals = this.values.slice();
-      if (this._alpha === 1) {
-         return vals.concat(this._alpha);
-      }
-      return vals;
-   },
-
-   toString: function(){
-      return string[this.space + 'String'](this.values, this._alpha);
-   }
-};
-
-
-Color.prototype.getValues = function(space) {
-   this.actualizeSpace(space);
-
-   var vals = {};
-   for (var i = 0; i < space.length; i++) {
-      vals[space[i]] = this.values[i];
-   }
-   if (this._alpha != 1) {
-      vals["a"] = this._alpha;
-   }
-   // {r: 255, g: 255, b: 255, a: 0.4}
-   return vals;
-};
-
-
-Color.prototype.setValues = function(space, vals) {
-   var alpha = 1;
-
-   //actualize target space
-   this.actualizeSpace(space);
-
-   if (space == "alpha") {
-      alpha = vals;
-   }
-   else if (vals.length) {
-      // [10, 10, 10]
-      this.values = vals.slice(0, space.length);
-      alpha = vals[space.length];
-   }
-   else if (vals[space[0]] !== undefined) {
-      // {r: 10, g: 10, b: 10}
-      for (var i = 0; i < space.length; i++) {
-        this.values[i] = vals[space[i]];
-      }
-      alpha = vals.a;
-   }
-   else if (vals[convert[space].channel[0]] !== undefined) {
-      // {red: 10, green: 10, blue: 10}
-      var chans = convert[space].channel;
-      for (var i = 0; i < space.length; i++) {
-        this.values[i] = vals[chans[i]];
-      }
-      alpha = vals.alpha;
-   }
-
-   this._alpha = Math.max(0, Math.min(1, (alpha !== undefined ? alpha : this._alpha) ));
-
-   if (space == "alpha") {
-      return;
-   }
-
-   // cap values
-   for (var i = 0, capped; i < space.length; i++) {
-      capped = Math.max(0, Math.min(convert[space].max[i], this.values[i]));
-      this.values[i] = Math.round(capped);
-   }
-
-   return true;
-};
-
-
-/** Update values for the space passed */
-Color.prototype.actualizeSpace = function(space){
-   var currSpace = this.space;
-
-   //space is already actual
-   if (currSpace !== space && space !== 'alpha') {
-      //calc new space values
-      this.values = convert[currSpace][space](this.values);
-      for (var i = this.values.length; i--;) this.values[i] = Math.round(this.values[i]);
-
-      //save last actual space
-      this.space = space;
-   }
-
-   return this;
-};
-
-
-Color.prototype.setSpace = function(space, args) {
-   var vals = args[0];
-   if (vals === undefined) {
-      // color.rgb()
-      return this.getValues(space);
-   }
-   // color.rgb(10, 10, 10)
-   if (typeof vals == "number") {
-      vals = Array.prototype.slice.call(args);
-   }
-   this.setValues(space, vals);
-   return this;
-};
-
-Color.prototype.setChannel = function(space, index, val) {
-   this.actualizeSpace(space);
-   if (val === undefined) {
-      // color.red()
-      return this.values[index];
-   }
-   // color.red(100)
-   this.values[index] = Math.max(Math.min(val, convert[space].max[index]), 0);
-   return this;
-};
-
+/**
+ * Barebones color class.
+ *
+ * @module  color/color
+ */
 module.exports = Color;
+
+
+
+var	parse = require('color-parse');
+var	stringify = require('color-stringify');
+var spaces = require('color-space');
+
+var slice = require('sliced');
+var pad = require('left-pad');
+var isString = require('mutype/is-string');
+var isObject = require('mutype/is-object');
+var isArray = require('mutype/is-array');
+var isNumber = require('mutype/is-number');
+var loop = require('mumath/loop');
+var round = require('mumath/round');
+var between = require('mumath/between');
+var capfirst = require('mustring/capfirst');
+
+
+
+/**
+ * Color class.
+ * It innerly keeps updated xyz/rgb values on order to preserve quality.
+ * @constructor
+ */
+function Color (cstr) {
+	if (!(this instanceof Color)) return new Color(cstr);
+
+	var self = this;
+
+	//actual values
+	self._values = [0,0,0];
+	self._alpha = 1;
+	self._space = 'rgb';
+
+	//parse argument
+	self.parse(cstr);
+}
+
+
+
+/** Static parser/stringifier */
+Color.parse = function (cstr) {
+	return new Color(cstr);
+};
+
+Color.stringify = function (color, space) {
+	return color.toString(space);
+};
+
+
+
+/** API */
+var proto = Color.prototype;
+
+
+/** Universal setter, detecting the type of argument */
+proto.parse = function (arg, space) {
+	var self = this;
+
+	//Color instance
+	if (arg instanceof Color) {
+		self.fromArray(arg._values, arg._space);
+	}
+	//[0,0,0]
+	else if (isArray(arg)) {
+		self.fromArray(arg, space);
+	}
+	//'rgb(0,0,0)'
+	else if (isString(arg)) {
+		self.fromString(arg);
+	}
+	//{r:0, g:0, b:0}
+	else if (isObject(arg)) {
+		self.fromJSON(arg);
+	}
+	//123445
+	else if (isNumber(arg)) {
+		self.fromNumber(arg);
+	}
+
+	return self;
+};
+
+
+/** String parser/stringifier */
+proto.fromString = function (cstr) {
+	var res = parse(cstr);
+	this.setValues(res.values, res.space);
+	this.setAlpha(res.alpha);
+	return this;
+};
+
+proto.toString = function (type) {
+	type = type || this.getSpace();
+	var values = this.getValues(spaces[type] ? type : 'rgb');
+	values = round(values);
+	if (this._alpha < 1) values.push(this.getAlpha());
+	return stringify(values, type);
+};
+
+
+/** Array setter/getter */
+proto.fromArray = function (arr, space) {
+	this.setValues(space.name, space || this.getSpace(), slice(arr));
+	return this;
+};
+
+proto.toArray = function (space) {
+	if (space && space !== this._space) this.setSpace(space);
+	return slice(this._values);
+};
+
+
+/** JSON setter/getter */
+proto.fromJSON = function (obj, spaceName) {
+	var space;
+
+	if (spaceName) {
+		space = spaces[spaceName];
+	} else {
+		//find space by the most channel match
+		var maxChannelsMatched = 0, channelsMatched = 0;
+		for ( var key in spaces ) {
+			channelsMatched = spaces[key].channel.reduce(function (prev, curr) {
+				if (obj[curr] !== undefined || obj[curr[0]] !== undefined) return prev+1;
+				else return prev;
+			}, 0);
+
+			if (channelsMatched > maxChannelsMatched) {
+				maxChannelsMatched = channelsMatched;
+				space = spaces[key];
+			}
+
+			if (channelsMatched >= 3) break;
+		}
+	}
+
+	//if no space for a JSON found
+	if (!space) throw Error('Cannot find space for color object');
+
+	//for the space found set values
+	this.setValues(space.channel.map(function (channel, i) {
+		return obj[channel] !== undefined ? obj[channel] : channel === 'black' ? obj.k : obj[channel[0]];
+	}), space.name);
+
+	var alpha = obj.a !== undefined ? obj.a : obj.alpha;
+	if (alpha !== undefined) this.setAlpha(alpha);
+
+	return this;
+};
+
+proto.toJSON = function (spaceName) {
+	var space = spaces[spaceName || this._space];
+	var result = {};
+	var values = this.getValues();
+
+	result.alpha = this._alpha;
+
+	//go by channels, create properties
+	space.channel.forEach(function (channel, i) {
+		result[channel[0]] = values[i];
+	});
+
+	//{red:10, green:20, blue:30, alpha: 0.2}
+	return result;
+};
+
+
+/** HEX number getter/setter */
+proto.fromNumber = function (int) {
+	var str = '#' + pad(int.toString(16), 6, 0);
+	return this.fromString(str);
+};
+
+proto.toNumber = function () {
+	return (this._rgb[0] << 16) | (this._rgb[1] << 8) | this._rgb[2];
+};
+
+
+/**
+ * Universal component setter and getter
+ *
+ * @param {string} component Whether space or channel identifier
+ * @param {number|array|object|string} value A value for the component
+ */
+proto.set = function (component, value) {
+	xxx
+};
+
+proto.get = function (component) {
+	xxx
+};
+
+
+/**
+ * Current space values
+ */
+proto.values = function () {
+	if (arguments.length) return this.setValues.apply(this, arguments);
+	return this.getValues.apply(this, arguments);
+};
+
+/**
+ * Return values for a passed state
+ * Or for current state
+ *
+ * @param {string} space A space to calculate values for
+ *
+ * @return {Array} List of values
+ */
+proto.getValues = function (space) {
+	var values;
+
+	//convert values to a target space
+	if (space && space !== this._space) {
+		values = spaces.xyz[space](this._xyz);
+	} else {
+		values = slice(this._values);
+	}
+
+	return values;
+};
+
+/**
+ * Set values for a space passed
+ *
+ * @param {Array} values List of values to set
+ * @param {string} spaceName Space indicator
+ */
+proto.setValues = function(values, spaceName) {
+	if (arguments.length && isNumber(values)) return this.setValues(slice(arguments));
+
+	if (!spaceName || !spaces[spaceName]) spaceName = this._space;
+
+	this._space = spaceName;
+
+	var space = spaces[spaceName];
+
+	//walk by values list, cap them
+	var isArr = isArray(values);
+	this._values = space.channel.map(function (channel, i) {
+		var value = isArr ? values[i] : values[channel] !== undefined ? values[channel] : values[channel[0]];
+
+		if (channel === 'hue') return loop(value, space.min[i], space.max[i]);
+		return between(value, space.min[i], space.max[i]);
+	});
+
+	var alpha = isArr && values.length > space.channel.length ? values[space.channel.length] : values.a !== undefined ? values.a : values.alpha;
+	if (alpha !== undefined) this.setAlpha(alpha);
+
+	//update xyz cache
+	this._xyz = spaces[spaceName].xyz(this._values);
+
+	return this;
+};
+
+
+/**
+ * Current space
+ */
+proto.space = function () {
+	if (arguments.length) return this.setSpace.apply(this, arguments);
+	return this.getSpace.apply(this, arguments);
+};
+
+/** Return current space */
+proto.getSpace = function () {
+	return this._space;
+};
+
+/** Switch to a new space with optional new values */
+proto.setSpace = function (space, values) {
+	if (!space || !spaces[space]) throw Error('Cannot set space ' + space);
+
+	if (space === this._space) return this;
+
+	if (values) return this.setValues(values, space);
+
+	//just convert current values to a new space
+	this._values = spaces.xyz[space](this._xyz);
+	this._space = space;
+
+	return this;
+};
+
+
+/** Channel getter/setter */
+proto.channel = function () {
+	if (arguments.length > 1) return this.setChannel.apply(this, arguments);
+	return this.getChannel.apply(this, arguments);
+};
+
+/** Get channel value */
+proto.getChannel = function (channel) {
+	return this[channel]();
+};
+
+/** Set current channel value */
+proto.setChannel = function (channel, value) {
+	this[channel](value);
+};
+
+
+/** Define named set of methods for a space */
+proto.defineSpace = function (name, space) {
+	var setName = 'set' + capfirst(name);
+	var getName = 'get' + capfirst(name);
+	var precision = Math.abs(space.max[0] - space.min[0]) > 1 ? 1 : 0.01;
+
+	// .rgb()
+	proto[name] = function (values) {
+		if (arguments.length) {
+			return this[setName].apply(this, arguments);
+		} else {
+			return this[getName].apply(this, arguments);
+		}
+	};
+
+	// .setRgb()
+	proto[setName] = function (values) {
+		if (arguments.length > 1) values = slice(arguments);
+		return this.setValues(values, name);
+	};
+	// .getRgb()
+	proto[getName] = function () {
+		//a special kind of short JSON - to be compliant with color
+		var result = {};
+		var values = this.getValues(name);
+
+		//go by channels, create properties
+		space.channel.forEach(function (channel, i) {
+			result[channel === 'black' ? 'k' : channel[0]] = round(values[i], precision);
+		});
+
+		if (this._alpha < 1) result.a = this._alpha;
+
+		//{red:10, green:20, blue:30, alpha: 0.2}
+		return result;
+	};
+
+	// .rgbString()
+	proto[name + 'String'] = function (cstr) {
+		if (cstr) return this.fromString(cstr);
+		return this.toString(name);
+	};
+
+	// .rgbArray()
+	proto[name + 'Array'] = function (values) {
+		if (arguments.length) return this.fromArray(values);
+		return this.toArray(name);
+	};
+
+	// .red(), .green(), .blue()
+	space.channel.forEach(function (cname, cidx) {
+		if (proto[cname]) return;
+		proto[cname] = function (value) {
+			this.setSpace(name);
+			var values = this.getValues();
+			if (value !== undefined) {
+				values[cidx] = value;
+				return this.setValues(values);
+			}
+			else {
+				return round(values[cidx], precision);
+			}
+		};
+	});
+};
+
+
+/**
+ * Create per-space per-channel API
+ */
+Object.keys(spaces).forEach(function (name) {
+	proto.defineSpace(name, spaces[name]);
+});
+
+
+/**
+ * Alpha getter / setter
+ */
+proto.alpha = function () {
+	if (arguments.length) return this.setAlpha.apply(this, arguments);
+	return this.getAlpha();
+};
+proto.setAlpha = function (value) {
+	this._alpha = between(value, 0, 1);
+	return this;
+};
+
+proto.getAlpha = function () {
+	return this._alpha;
+};
+
+
+/**
+ * Rgba, hsla getter/setter. Specific array wrappers to add alpha.
+ */
+proto.defineSpace('rgba', spaces.rgb);
+proto.defineSpace('hsla', spaces.hsl);
+
+proto.rgbaArray = function () {
+	var res = this.rgbArray.apply(this, arguments);
+	res.push(this.getAlpha());
+	return res;
+};
+proto.hslaArray = function () {
+	var res = this.rgbArray.apply(this, arguments);
+	res.push(this.getAlpha());
+	return res;
+};
+
+/** Hex string parser is the same as simple parser */
+proto.hexString = function (values) {
+	if (arguments.length) return this.fromString(values, 'hex');
+	return this.toString('hex').toUpperCase();
+};
+
+/** Percent string formatter */
+proto.percentString = function () {
+	var vals = this.getValues();
+	var a = this.getAlpha();
+	return 'rgb' + ( a < 1 ? 'a' : '' ) + '(' + vals.map(function (val) {
+		return round(val * 100 / 255) + '%';
+	}).join(', ') + ( a < 1 ? ', ' + a : '' ) + ')';
+};
+
+//keyword
+//gray
+//toFilter
+//isValid
+//getFormat
+//random
+// ie-hex-str($color)
+//is(otherColor)

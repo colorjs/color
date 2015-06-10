@@ -1,5 +1,5 @@
 {
-  "name": "color",
+  "name": "colour",
   "description": "Color conversion and manipulation with CSS string support",
   "version": "0.7.3",
   "author": "Heather Arthur <fayearthur@gmail.com>",
@@ -8,16 +8,20 @@
     "type": "git",
     "url": "http://github.com/harthur/color.git"
   },
-  "main": "./color",
+  "main": "index.js",
   "dependencies": {
-    "color-string": "dfcreative/color-string",
-    "color-space": ">=1.0.0"
+    "color-parse": "^1.0.2",
+    "color-space": ">=1.0.0",
+    "color-stringify": "^1.0.1",
+    "left-pad": "latest",
+    "mumath": "^1.0.2",
+    "mustring": "0.0.5",
+    "mutype": "^0.3.5",
+    "sliced": "latest"
   },
   "devDependencies": {
-    "nomnom": "~1.5.2",
-    "browserify": "~2.18.1",
-    "grunt": "~0.4.1",
-    "grunt-contrib-uglify": "~0.2.0"
+    "chai": "^3.0.0",
+    "mocha": "^2.2.5"
   },
   "keywords": [
     "color",
@@ -25,6 +29,6 @@
     "css"
   ],
   "scripts": {
-    "test": "node test/basic.js"
+    "test": "mocha"
   }
 }
