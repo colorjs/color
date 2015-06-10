@@ -1,4 +1,4 @@
-# color2 [![Build Status](https://travis-ci.org/dfcreative/color2.svg?branch=master)](https://travis-ci.org/dfcreative/color2) [![Code Climate](https://codeclimate.com/github/dfcreative/color2/badges/gpa.svg)](https://codeclimate.com/github/dfcreative/color2)
+# color [![Build Status](https://travis-ci.org/dfcreative/color.svg?branch=master)](https://travis-ci.org/dfcreative/color) [![Code Climate](https://codeclimate.com/github/dfcreative/color/badges/gpa.svg)](https://codeclimate.com/github/dfcreative/color)
 
 A stateful implementation of [color](http://npmjs.org/package/color).
 
