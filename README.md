@@ -4,11 +4,11 @@ A stateful implementation of [color](http://npmjs.org/package/color).
 
 Basically:
 
-* [new color spaces](http://github.com/dfcreative/color-space)
-* [new manipulation & measurement functions](http://github.com/dfcreative/color-manipulate)
-* [better parsing of input values](http://github.com/dfcreative/color-parse)
-* [increased performance](TODO: tests link)
-* [normalized API](#API)
+* new [color spaces](http://github.com/dfcreative/color-space)
+* new [manipulation & measurement functions](http://github.com/dfcreative/color-manipulate)
+* better [parsing of input values](http://github.com/dfcreative/color-parse)
+* increased [performance](http://TODOtests)
+* normalized [API](#API)
 
 
 ## Usage
