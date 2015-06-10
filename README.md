@@ -4,11 +4,11 @@ A stateful implementation of [color](http://npmjs.org/package/color).
 
 Basically:
 
-* new color spaces
-* new manipulation & measurement functions
-* better parsing of input values
-* increased performance
-* normalized API
+* [new color spaces](http://github.com/dfcreative/color-space)
+* [new manipulation & measurement functions](http://github.com/dfcreative/color-manipulate)
+* [better parsing of input values](http://github.com/dfcreative/color-parse)
+* [increased performance](TODO: tests link)
+* [normalized API](#API)
 
 
 ## Usage
@@ -29,6 +29,8 @@ console.log(color.hslString());  // "hsla(262, 59%, 81%, 0.5)"
 
 ## API
 
+API is fully compatible with [color](http://github.com/harthur/color#API).
+
 ### Setters
 
 ### Getters
@@ -43,7 +45,7 @@ console.log(color.hslString());  // "hsla(262, 59%, 81%, 0.5)"
 ## Why not [color](https://github.com/harthur/color)?
 //TODO: remove this
 
-_Color_ is great for basic color manipulations, but in practice it’s API might be confusing.
+_Color_ is great for basic color manipulations, but in practice it might be confusing.
 
 * `new Color([0,10,20])` - a natural way to create color from rgb array is not supported.
 * `.setSpace()` with no arguments is factually a `.getSpace()`.
