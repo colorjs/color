@@ -45,7 +45,6 @@ function Color (arg, space) {
 }
 
 
-
 /** Static parser/stringifier */
 Color.parse = function (cstr) {
 	return new Color(cstr);
@@ -181,7 +180,7 @@ proto.fromJSON = function (obj, spaceName) {
 		var maxChannelsMatched = 0, channelsMatched = 0;
 		for ( var key in spaces ) {
 			channelsMatched = spaces[key].channel.reduce(function (prev, curr) {
-				if (obj[curr] !== undefined || obj[curr[0]] !== undefined) return prev+1;
+				if (obj[curr] !== undefined || obj[ch(curr)] !== undefined) return prev+1;
 				else return prev;
 			}, 0);
 
