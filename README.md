@@ -171,7 +171,7 @@ color.luminance(); //1.123
 
 ## Contribute
 
-The goal of the project is to provide fast and extensible color class with intuitive API. Please make sure your issue does not belong to the one of the subpackages: [color-stringify](), [color-manipulate](), [color-parse](), and then [contribute](https://github.com/dfcreative/color/issues/new/).
+The goal of the project is to provide fast and extensible color class with intuitive API. Please make sure your issue does not belong to a subpackage: [color-stringify](http://github.com/dfcreative/color-stringify), [color-manipulate](http://github.com/dfcreative/color-manipulate), [color-parse](http://github.com/dfcreative/color-parse), and only then [contribute](https://github.com/dfcreative/color/issues/new/).
 
 
 [![NPM](https://nodei.co/npm/color2.png?downloads=true&downloadRank=true&stars=true)](https://nodei.co/npm/color2/)
