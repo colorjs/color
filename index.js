@@ -65,7 +65,15 @@ var proto = Color.prototype;
 proto.parse = function (arg, space) {
 	var self = this;
 
-	if (isNumber(arg)) {
+	if (!arg) {
+		return self;
+	}
+
+	//[0,0,0]
+	else if (isArray(arg)) {
+		self.fromArray(arg, space);
+	}
+	else if (isNumber(arg)) {
 		//12, 25, 47 [, space]
 		if (arguments.length > 2) {
 			var args = slice(arguments);
@@ -76,10 +84,6 @@ proto.parse = function (arg, space) {
 		else {
 			self.fromNumber(arg, space);
 		}
-	}
-	//[0,0,0]
-	else if (isArray(arg)) {
-		self.fromArray(arg, space);
 	}
 	//'rgb(0,0,0)'
 	else if (isString(arg)) {
@@ -123,17 +127,18 @@ proto.fromArray = function (values, spaceName) {
 
 	var space = spaces[spaceName];
 
-	//walk by values list, cap them
-	this._values = space.channel.map(function (channel, i) {
-		if (channel === 'hue') return loop(values[i], space.min[i], space.max[i]);
-		return between(values[i], space.min[i], space.max[i]);
-	});
-
+	//get alpha
 	if (values.length > space.channel.length) {
 		this.setAlpha(values[space.channel.length]);
+		values = slice(values, 0, space.channel.length);
 	}
 
-	//update xyz cache
+	//walk by values list, cap them
+	this._values = values.map(function (value, i) {
+		return cap(value, space.name, i);
+	});
+
+	//update raw xyz cache
 	this._xyz = spaces[spaceName].xyz(this._values);
 
 	return this;
@@ -152,8 +157,12 @@ proto.toArray = function (space) {
 			values = spaces.xyz[space](this._xyz);
 		}
 	} else {
-		values = slice(this._values);
+		values = this._values;
 	}
+
+	values = values.map(function (value, i) {
+		return round(value, spaces[space].precision[i]);
+	});
 
 	return values;
 };
@@ -201,17 +210,18 @@ proto.fromJSON = function (obj, spaceName) {
 
 proto.toJSON = function (spaceName) {
 	var space = spaces[spaceName || this._space];
-	var result = {};
-	var values = this.toArray();
 
-	result.alpha = this._alpha;
+	var result = {};
+
+	var values = this.toArray(space.name);
 
 	//go by channels, create properties
 	space.channel.forEach(function (channel, i) {
 		result[ch(channel)] = values[i];
 	});
 
-	//{red:10, green:20, blue:30, alpha: 0.2}
+	if (this._alpha < 1) result.a = this._alpha;
+
 	return result;
 };
 
@@ -308,13 +318,17 @@ proto.channel = function () {
 };
 
 /** Get channel value */
-proto.getChannel = function (channel) {
-	return this[channel]();
+proto.getChannel = function (space, idx) {
+	this.setSpace(space);
+	return this._values[idx];
 };
 
 /** Set current channel value */
-proto.setChannel = function (channel, value) {
-	this[channel](value);
+proto.setChannel = function (space, idx, value) {
+	this.setSpace(space);
+	this._values[idx] = cap(value, space, idx);
+	this._xyz = spaces[space].xyz(this._values);
+	return this;
 };
 
 
@@ -322,37 +336,29 @@ proto.setChannel = function (channel, value) {
 proto.defineSpace = function (name, space) {
 	var setName = 'set' + capfirst(name);
 	var getName = 'get' + capfirst(name);
-	var precision = Math.abs(space.max[0] - space.min[0]) > 1 ? 1 : 0.01;
+
+	//create precisions
+	space.precision = space.channel.map(function (ch, idx) {
+		return Math.abs(space.max[idx] - space.min[idx]) > 1 ? 1 : 0.01;
+	});
 
 	// .rgb()
-	proto[name] = function (values) {
+	proto[name] = function () {
 		if (arguments.length) {
 			return this[setName].apply(this, arguments);
 		} else {
-			return this[getName].apply(this, arguments);
+			return this[getName]();
 		}
 	};
 
 	// .setRgb()
 	proto[setName] = function (values) {
-		if (arguments.length > 1) values = slice(arguments);
+		if (arguments.length > 1) return this.setValues(slice(arguments), name);
 		return this.setValues(values, name);
 	};
 	// .getRgb()
 	proto[getName] = function () {
-		//a special kind of short JSON - to be compliant with color
-		var result = {};
-		var values = this.toArray(name);
-
-		//go by channels, create properties
-		space.channel.forEach(function (channel, i) {
-			result[ch(channel)] = round(values[i], precision);
-		});
-
-		if (this._alpha < 1) result.a = this._alpha;
-
-		//{red:10, green:20, blue:30, alpha: 0.2}
-		return result;
+		return this.toJSON(name);
 	};
 
 	// .rgbString()
@@ -377,14 +383,11 @@ proto.defineSpace = function (name, space) {
 	space.channel.forEach(function (cname, cidx) {
 		if (proto[cname]) return;
 		proto[cname] = function (value) {
-			this.setSpace(name);
-			var values = this.toArray();
-			if (value !== undefined) {
-				values[cidx] = value;
-				return this.setValues(values);
+			if (arguments.length) {
+				return this.setChannel(name, cidx, value);
 			}
 			else {
-				return round(values[cidx], precision);
+				return round(this.getChannel(name, cidx), space.precision[cidx]);
 			}
 		};
 	});
@@ -402,8 +405,8 @@ Object.keys(spaces).forEach(function (name) {
 /**
  * Alpha getter / setter
  */
-proto.alpha = function () {
-	if (arguments.length) return this.setAlpha.apply(this, arguments);
+proto.alpha = function (value) {
+	if (arguments.length) return this.setAlpha(value);
 	return this.getAlpha();
 };
 proto.setAlpha = function (value) {
@@ -484,6 +487,24 @@ function ch (name, obj) {
 	return name === 'black' ? 'k' : name[0];
 }
 
+/**
+ * Cap channel value.
+ * Note that cap should not round.
+ *
+ * @param {number} value A value to store
+ * @param {string} spaceName Space name take as a basis
+ * @param {int} idx Channel index
+ *
+ * @return {number} Capped value
+ */
+function cap(value, spaceName, idx) {
+	var space = spaces[spaceName];
+	if (space.channel[idx] === 'hue') {
+		return loop(value, space.min[idx], space.max[idx]);
+	} else {
+		return between(value, space.min[idx], space.max[idx]);
+	}
+}
 
 
 /**

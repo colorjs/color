@@ -1,6 +1,10 @@
 var Color = require("./");
 var assert = require("assert");
 
+//harthur color
+var Color1 = require("color");
+
+
 describe('Color tests', function () {
 	it('Color() instance', function () {
 		assert.equal(new Color("red").red(), 255);
@@ -176,11 +180,11 @@ describe('Color tests', function () {
 	});
 
 	it('Clone', function () {
-		var clone = Color({r: 10, g: 20, b: 30});
-		assert.deepEqual(clone.rgbaArray(), [10, 20, 30, 1]);
-		assert.deepEqual(clone.clone().rgb(50, 40, 30).rgbaArray(), [50, 40, 30, 1]);
-		assert.deepEqual(clone.clone().rgbaArray(), [10, 20, 30, 1]);
-		assert.deepEqual(clone.rgbaArray(), [10, 20, 30, 1]);
+		var c = Color({r: 10, g: 20, b: 30});
+		assert.deepEqual(c.rgbaArray(), [10, 20, 30, 1]);
+		assert.deepEqual(c.clone().rgb(50, 40, 30).rgbaArray(), [50, 40, 30, 1]);
+		assert.deepEqual(c.clone().rgbaArray(), [10, 20, 30, 1]);
+		assert.deepEqual(c.rgbaArray(), [10, 20, 30, 1]);
 	});
 
 	it('Immutability', function () {
@@ -200,22 +204,43 @@ describe('Color tests', function () {
 		});
 	});
 
-	it('Performance - render 100x100 range', function () {
-		var color = new Color('red');
-		var space = 'hsl';
+});
 
-		for (var x = 0, end = 2e5; x < end; x++){
-			color.setChannel(space, 1, 100 * x / end);
-			color.red();
-			color.green();
-			color.blue();
-		}
+
+describe('Performance', function () {
+	describe('Cross-conversion', function () {
+		it('Color', function () {
+			var color = new Color1('red');
+
+			for (var x = 0, end = 2e5; x < end; x++){
+				color.lightness(100 * x / end);
+				color.hue(100 * x / end);
+				color.red();
+				color.green();
+				color.blue();
+			}
+		});
+		it('Color2', function () {
+			var color = new Color('red');
+
+			for (var x = 0, end = 2e5; x < end; x++){
+				color.lightness(100 * x / end);
+				color.hue(100 * x / end);
+				color.red();
+				color.green();
+				color.blue();
+			}
+		});
 	});
-
 
 });
 
+
 describe.skip('Color2 tests', function () {
+	it.skip('back and forth transforms', function () {
+
+	});
+
 	it('fromNumber', function () {
 		assert.deepEqual(Color().fromNumber(123).rgbArray(), []);
 		assert.deepEqual(Color().fromNumber(123, 'hsl').hslArray(), []);
@@ -227,6 +252,9 @@ describe.skip('Color2 tests', function () {
 	});
 
 	it('getValues');
-	it('getChanel');
+	it('getChannel', function () {
+		//compatible with color
+
+	});
 	it('getSpace');
 });

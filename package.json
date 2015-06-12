@@ -8,6 +8,9 @@
     "type": "git",
     "url": "http://github.com/harthur/color.git"
   },
+  "files": [
+    "index.js"
+  ],
   "main": "index.js",
   "dependencies": {
     "color-name": "^1.0.0",
@@ -22,6 +25,7 @@
   },
   "devDependencies": {
     "chai": "^3.0.0",
+    "color": "^0.8.0",
     "mocha": "^2.2.5"
   },
   "keywords": [
