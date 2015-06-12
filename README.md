@@ -1,12 +1,12 @@
 # color [![Build Status](https://travis-ci.org/dfcreative/color.svg?branch=master)](https://travis-ci.org/dfcreative/color) [![Code Climate](https://codeclimate.com/github/dfcreative/color/badges/gpa.svg)](https://codeclimate.com/github/dfcreative/color) [![unstable](http://badges.github.io/stability-badges/dist/unstable.svg)](http://github.com/badges/stability-badges)
 
-A stateful implementation of [color](http://npmjs.org/package/color).
+A stateful implementation of [color](http://npmjs.org/package/color):
 
-* New [color spaces](http://github.com/dfcreative/color-space).
-* New [manipulation & measurement functions](http://github.com/dfcreative/color-manipulate).
-* Better [parsing of input values](http://github.com/dfcreative/color-parse).
-* Optimized [performance](http://TODOtests).
-* Normalized color[API](#API).
+* new [color spaces](http://github.com/dfcreative/color-space);
+* new [manipulation & measurement functions](http://github.com/dfcreative/color-manipulate);
+* better [parsing of input values](http://github.com/dfcreative/color-parse);
+* pptimized [performance](http://TODOtests);
+* normalized [API](#API).
 
 
 ## Usage
