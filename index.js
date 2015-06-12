@@ -1,27 +1,16 @@
-//TODO: merge actualizeSpace with setSpace
-//TODO: replace manual methods with method constructor
-//TODO: extend with additional space conversions
-//TODO: keep loselessly last two spaces, or one
-//TODO: move out color operations, leave truly minimal barebones
-//TODO: add performance tests referenced in harthur/color #43 ↓
-//There's the time it takes to instantiate a new Color object, the time it takes to set the values, the time it takes to get the values for the space specified, and the time to get the values for a space other than the one it's specified in.
-
-//TODO: ie8 tests on defineProperty
-
-
-
 /**
  * Barebones color class.
  *
+ * @module color
  */
+
 module.exports = Color;
 
 
-
-var	parse = require('color-parse');
-var	stringify = require('color-stringify');
+var parse = require('color-parse');
+var stringify = require('color-stringify');
 var spaces = require('color-space');
-
+var names = require('color-name');
 var slice = require('sliced');
 var pad = require('left-pad');
 var isString = require('mutype/is-string');
@@ -37,21 +26,22 @@ var capfirst = require('mustring/capfirst');
 
 /**
  * Color class.
- * It innerly keeps updated xyz/rgb values on order to preserve quality.
+ * It innerly keeps updated xyz values on order to preserve quality.
  * @constructor
  */
-function Color (cstr) {
-	if (!(this instanceof Color)) return new Color(cstr);
+function Color (arg, space) {
+	if (!(this instanceof Color)) return new Color(arg);
 
 	var self = this;
 
-	//actual values
+	//init model
 	self._values = [0,0,0];
-	self._alpha = 1;
 	self._space = 'rgb';
+	self._alpha = 1;
+	self._xyz = [0,0,0];
 
 	//parse argument
-	self.parse(cstr);
+	self.parse(arg, space);
 }
 
 
@@ -75,9 +65,17 @@ var proto = Color.prototype;
 proto.parse = function (arg, space) {
 	var self = this;
 
-	//Color instance
-	if (arg instanceof Color) {
-		self.fromArray(arg._values, arg._space);
+	if (isNumber(arg)) {
+		//12, 25, 47 [, space]
+		if (arguments.length > 2) {
+			var args = slice(arguments);
+			if (isString(args[args.length - 1])) space = args.pop();
+			self.parse(args, space);
+		}
+		//123445 [, space]
+		else {
+			self.fromNumber(arg, space);
+		}
 	}
 	//[0,0,0]
 	else if (isArray(arg)) {
@@ -85,15 +83,15 @@ proto.parse = function (arg, space) {
 	}
 	//'rgb(0,0,0)'
 	else if (isString(arg)) {
-		self.fromString(arg);
+		self.fromString(arg, space);
+	}
+	//Color instance
+	else if (arg instanceof Color) {
+		self.fromArray(arg._values, arg._space);
 	}
 	//{r:0, g:0, b:0}
 	else if (isObject(arg)) {
-		self.fromJSON(arg);
-	}
-	//123445
-	else if (isNumber(arg)) {
-		self.fromNumber(arg);
+		self.fromJSON(arg, space);
 	}
 
 	return self;
@@ -110,7 +108,7 @@ proto.fromString = function (cstr) {
 
 proto.toString = function (type) {
 	type = type || this.getSpace();
-	var values = this.getValues(spaces[type] ? type : 'rgb');
+	var values = this.toArray(spaces[type] ? type : 'rgb');
 	values = round(values);
 	if (this._alpha < 1) values.push(this.getAlpha());
 	return stringify(values, type);
@@ -118,14 +116,46 @@ proto.toString = function (type) {
 
 
 /** Array setter/getter */
-proto.fromArray = function (arr, space) {
-	this.setValues(space.name, space || this.getSpace(), slice(arr));
+proto.fromArray = function (values, spaceName) {
+	if (!spaceName || !spaces[spaceName]) spaceName = this._space;
+
+	this._space = spaceName;
+
+	var space = spaces[spaceName];
+
+	//walk by values list, cap them
+	this._values = space.channel.map(function (channel, i) {
+		if (channel === 'hue') return loop(values[i], space.min[i], space.max[i]);
+		return between(values[i], space.min[i], space.max[i]);
+	});
+
+	if (values.length > space.channel.length) {
+		this.setAlpha(values[space.channel.length]);
+	}
+
+	//update xyz cache
+	this._xyz = spaces[spaceName].xyz(this._values);
+
 	return this;
 };
 
 proto.toArray = function (space) {
-	if (space && space !== this._space) this.setSpace(space);
-	return slice(this._values);
+	var values;
+
+	//convert values to a target space
+	if (space && space !== this._space) {
+		//enhance calc precision, like hsl ←→ hsv ←→ hwb or lab ←→ lch ←→ luv
+		if (this._space[0] === space[0]) {
+			values = spaces[this._space][space](this._values);
+		}
+		else {
+			values = spaces.xyz[space](this._xyz);
+		}
+	} else {
+		values = slice(this._values);
+	}
+
+	return values;
 };
 
 
@@ -135,8 +165,10 @@ proto.fromJSON = function (obj, spaceName) {
 
 	if (spaceName) {
 		space = spaces[spaceName];
-	} else {
-		//find space by the most channel match
+	}
+
+	//find space by the most channel match
+	if (!space) {
 		var maxChannelsMatched = 0, channelsMatched = 0;
 		for ( var key in spaces ) {
 			channelsMatched = spaces[key].channel.reduce(function (prev, curr) {
@@ -154,11 +186,11 @@ proto.fromJSON = function (obj, spaceName) {
 	}
 
 	//if no space for a JSON found
-	if (!space) throw Error('Cannot find space for color object');
+	if (!space) throw Error('Cannot detect space.');
 
 	//for the space found set values
-	this.setValues(space.channel.map(function (channel, i) {
-		return obj[channel] !== undefined ? obj[channel] : channel === 'black' ? obj.k : obj[channel[0]];
+	this.fromArray(space.channel.map(function (channel, i) {
+		return obj[channel] !== undefined ? obj[channel] : obj[ch(channel)];
 	}), space.name);
 
 	var alpha = obj.a !== undefined ? obj.a : obj.alpha;
@@ -170,13 +202,13 @@ proto.fromJSON = function (obj, spaceName) {
 proto.toJSON = function (spaceName) {
 	var space = spaces[spaceName || this._space];
 	var result = {};
-	var values = this.getValues();
+	var values = this.toArray();
 
 	result.alpha = this._alpha;
 
 	//go by channels, create properties
 	space.channel.forEach(function (channel, i) {
-		result[channel[0]] = values[i];
+		result[ch(channel)] = values[i];
 	});
 
 	//{red:10, green:20, blue:30, alpha: 0.2}
@@ -185,13 +217,14 @@ proto.toJSON = function (spaceName) {
 
 
 /** HEX number getter/setter */
-proto.fromNumber = function (int) {
-	var str = '#' + pad(int.toString(16), 6, 0);
-	return this.fromString(str);
+proto.fromNumber = function (int, space) {
+	var values = pad(int.toString(16), 6, 0).split(/(..)/).filter(Boolean);
+	return this.fromArray(values, space);
 };
 
-proto.toNumber = function () {
-	return (this._rgb[0] << 16) | (this._rgb[1] << 8) | this._rgb[2];
+proto.toNumber = function (space) {
+	var values = this.toArray(space);
+	return (values[0] << 16) | (values[1] << 8) | values[2];
 };
 
 
@@ -202,11 +235,11 @@ proto.toNumber = function () {
  * @param {number|array|object|string} value A value for the component
  */
 proto.set = function (component, value) {
-	xxx
+	xxx;
 };
 
 proto.get = function (component) {
-	xxx
+	xxx;
 };
 
 
@@ -219,24 +252,15 @@ proto.values = function () {
 };
 
 /**
- * Return values for a passed state
- * Or for current state
+ * Return values array for a passed space
+ * Or for current space
  *
  * @param {string} space A space to calculate values for
  *
  * @return {Array} List of values
  */
 proto.getValues = function (space) {
-	var values;
-
-	//convert values to a target space
-	if (space && space !== this._space) {
-		values = spaces.xyz[space](this._xyz);
-	} else {
-		values = slice(this._values);
-	}
-
-	return values;
+	return this.toArray(space);
 };
 
 /**
@@ -245,32 +269,7 @@ proto.getValues = function (space) {
  * @param {Array} values List of values to set
  * @param {string} spaceName Space indicator
  */
-proto.setValues = function(values, spaceName) {
-	if (arguments.length && isNumber(values)) return this.setValues(slice(arguments));
-
-	if (!spaceName || !spaces[spaceName]) spaceName = this._space;
-
-	this._space = spaceName;
-
-	var space = spaces[spaceName];
-
-	//walk by values list, cap them
-	var isArr = isArray(values);
-	this._values = space.channel.map(function (channel, i) {
-		var value = isArr ? values[i] : values[channel] !== undefined ? values[channel] : values[channel[0]];
-
-		if (channel === 'hue') return loop(value, space.min[i], space.max[i]);
-		return between(value, space.min[i], space.max[i]);
-	});
-
-	var alpha = isArr && values.length > space.channel.length ? values[space.channel.length] : values.a !== undefined ? values.a : values.alpha;
-	if (alpha !== undefined) this.setAlpha(alpha);
-
-	//update xyz cache
-	this._xyz = spaces[spaceName].xyz(this._values);
-
-	return this;
-};
+proto.setValues = proto.parse;
 
 
 /**
@@ -343,11 +342,11 @@ proto.defineSpace = function (name, space) {
 	proto[getName] = function () {
 		//a special kind of short JSON - to be compliant with color
 		var result = {};
-		var values = this.getValues(name);
+		var values = this.toArray(name);
 
 		//go by channels, create properties
 		space.channel.forEach(function (channel, i) {
-			result[channel === 'black' ? 'k' : channel[0]] = round(values[i], precision);
+			result[ch(channel)] = round(values[i], precision);
 		});
 
 		if (this._alpha < 1) result.a = this._alpha;
@@ -368,12 +367,18 @@ proto.defineSpace = function (name, space) {
 		return this.toArray(name);
 	};
 
+	// .rgbNumber()
+	proto[name + 'Number'] = function (values) {
+		if (arguments.length) return this.fromNumber(values);
+		return this.toNumber(name);
+	};
+
 	// .red(), .green(), .blue()
 	space.channel.forEach(function (cname, cidx) {
 		if (proto[cname]) return;
 		proto[cname] = function (value) {
 			this.setSpace(name);
-			var values = this.getValues();
+			var values = this.toArray();
 			if (value !== undefined) {
 				values[cidx] = value;
 				return this.setValues(values);
@@ -429,21 +434,42 @@ proto.hslaArray = function () {
 };
 
 /** Hex string parser is the same as simple parser */
-proto.hexString = function (values) {
-	if (arguments.length) return this.fromString(values, 'hex');
-	return this.toString('hex').toUpperCase();
+proto.hexString = function (str) {
+	if (arguments.length) {
+		return this.fromString(str, 'hex');
+	}
+	else {
+		return this.toString('hex').toUpperCase();
+	}
 };
 
 /** Percent string formatter */
-proto.percentString = function () {
-	var vals = this.getValues();
-	var a = this.getAlpha();
-	return 'rgb' + ( a < 1 ? 'a' : '' ) + '(' + vals.map(function (val) {
-		return round(val * 100 / 255) + '%';
-	}).join(', ') + ( a < 1 ? ', ' + a : '' ) + ')';
+proto.percentString = function (str) {
+	if (arguments.length) {
+		return this.fromString(str, 'percent');
+	}
+	else {
+		return this.toString('percent');
+	}
 };
 
-//keyword
+
+/** Keyword setter/getter */
+proto.keyword = function (str) {
+	if (arguments.length) {
+		return this.fromString(str, 'keyword');
+	}
+	else {
+		return this.toString('keyword');
+	}
+};
+
+/** Clone instance */
+proto.clone = function () {
+	return (new Color()).fromArray(this._values, this._space);
+};
+
+
 //gray
 //toFilter
 //isValid
@@ -453,27 +479,10 @@ proto.percentString = function () {
 //is(otherColor)
 
 
-
-
-/**
- * Spaces API
- * based on color-space module
- */
-// Object.keys(spaces).forEach(function (name) {
-	//.rgb
-	// proto[space.name] = function () {
-
-	// };
-
-	//.setRgb()
-	//.getRgb()
-
-	//.rgbString()
-
-	//.rgbArray()
-
-	//.red(), .green(), .blue()
-// });
+/** Get short channel name */
+function ch (name, obj) {
+	return name === 'black' ? 'k' : name[0];
+}
 
 
 

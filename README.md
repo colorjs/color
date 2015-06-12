@@ -29,8 +29,6 @@ console.log(color.hslString());  // "hsla(262, 59%, 81%, 0.5)"
 
 ## API
 
-API is fully compatible with [color](http://github.com/harthur/color#API).
-
 ### Setters
 
 ### Getters

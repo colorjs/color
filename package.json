@@ -10,6 +10,7 @@
   },
   "main": "index.js",
   "dependencies": {
+    "color-name": "^1.0.0",
     "color-parse": "^1.0.2",
     "color-space": ">=1.0.0",
     "color-stringify": "^1.0.1",

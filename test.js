@@ -86,7 +86,7 @@ describe('Color tests', function () {
 		assert.equal(Color({r: 10, g: 20, b: 30}).blue(60).blue(), 60);
 		assert.equal(Color({h: 10, s: 20, l: 30}).hue(), 10);
 		assert.equal(Color({h: 10, s: 20, l: 30}).hue(100).hue(), 100);
-		assert.equal(r(Color({h: 10, w: 20, b: 30}).hue()), 10);
+		assert.equal(Color({h: 10, w: 20, b: 30}).hue(), 10);
 		assert.equal(Color({h: 10, w: 20, b: 30}).hue(100).hue(), 100);
 	});
 
@@ -115,7 +115,7 @@ describe('Color tests', function () {
 		assert.equal(Color("rgb(10, 30, 25)").rgbString(), "rgb(10, 30, 25)")
 		assert.equal(Color("rgb(10, 30, 25, 0.4)").rgbString(), "rgba(10, 30, 25, 0.4)")
 		assert.equal(Color("rgb(10, 30, 25)").percentString(), "rgb(4%, 12%, 10%)")
-		assert.equal(Color("rgb(10, 30, 25, 0.3)").percentString(), "rgba(4%, 12%, 10%, 0.3)")
+		assert.equal(Color("rgba(10, 30, 25, 0.3)").percentString(), "rgba(4%, 12%, 10%, 0.3)")
 		assert.equal(Color("rgb(10, 30, 25)").hslString(), "hsl(165, 50%, 8%)")
 		assert.equal(Color("rgb(10, 30, 25, 0.3)").hslString(), "hsla(165, 50%, 8%, 0.3)");
 		assert.equal(Color({ h : 0, s : 0, v : 100 }).hslString(), "hsl(0, 0%, 100%)");
@@ -129,7 +129,7 @@ describe('Color tests', function () {
 		assert.equal(Color("rgb(10, 30, 25)").rgbNumber(), 0xA1E19)
 	});
 
-	it('luminosity, etc.', function () {
+	it('Metrics', function () {
 		assert.equal(Color("white").luminosity(), 1);
 		assert.equal(Color("black").luminosity(), 0);
 		assert.equal(Color("red").luminosity(), 0.2126);
@@ -146,9 +146,12 @@ describe('Color tests', function () {
 		assert.ok(Color("pink").light());
 		assert.ok(Color("goldenrod").light());
 		assert.ok(Color("red").dark());
+
+		assert.equal(Color("white").level(Color("black")), "AAA");
+		assert.equal(Color("grey").level(Color("black")), "AA");
 	});
 
-	it('Manipulators', function () {
+	it('Manipulations', function () {
 		assert.equal(Color({h: 100, s: 50, l: 80}).lighten(0.5).lightness(), 100);
 		assert.equal(Color({h: 100, w: 50, b: 80}).blacken(0.5).blackness(), 100);
 		assert.deepEqual(Color({r: 67, g: 122, b: 134}).greyscale().rgb(), {r: 107, g: 107, b: 107});
@@ -181,24 +184,20 @@ describe('Color tests', function () {
 	});
 
 	it('Immutability', function () {
-		var arr = clone.rgbArray();
+		var c = Color([10, 20, 30]);
+		var arr = c.rgbArray();
 		arr.push(255);
-		assert.deepEqual(clone.rgbaArray(), [10, 20, 30, 1]);
-	});
-
-	it('Level', function () {
-		assert.equal(Color("white").level(Color("black")), "AAA");
-		assert.equal(Color("grey").level(Color("black")), "AA");
+		assert.deepEqual(c.rgbaArray(), [10, 20, 30, 1]);
 	});
 
 	it('Exceptions', function () {
 		assert.throws(function () {
-		  Color("unknow")
-		}, /Unable to parse color from string/);
+		  Color("unknow");
+		});
 
 		assert.throws(function () {
-		  Color({})
-		}, /Unable to parse color from object/);
+		  Color({});
+		});
 	});
 
 	it('Performance - render 100x100 range', function () {
@@ -212,4 +211,22 @@ describe('Color tests', function () {
 			color.blue();
 		}
 	});
+
+
+});
+
+describe.skip('Color2 tests', function () {
+	it('fromNumber', function () {
+		assert.deepEqual(Color().fromNumber(123).rgbArray(), []);
+		assert.deepEqual(Color().fromNumber(123, 'hsl').hslArray(), []);
+	});
+
+	it('gray space', function () {
+		Color(12, 'gray');
+		Color(12);
+	});
+
+	it('getValues');
+	it('getChanel');
+	it('getSpace');
 });
