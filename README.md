@@ -5,7 +5,7 @@ A stateful implementation of [color](http://npmjs.org/package/color).
 * New [color spaces](http://github.com/dfcreative/color-space).
 * New [manipulation & measurement functions](http://github.com/dfcreative/color-manipulate).
 * Better [parsing of input values](http://github.com/dfcreative/color-parse).
-* Increased [performance](http://TODOtests).
+* Optimized [performance](http://TODOtests).
 * Normalized color[API](#API).
 
 

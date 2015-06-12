@@ -478,12 +478,12 @@ proto.clone = function () {
 //isValid
 //getFormat
 //random
-// ie-hex-str($color)
+//ie-hex-str($color)
 //is(otherColor)
 
 
 /** Get short channel name */
-function ch (name, obj) {
+function ch (name) {
 	return name === 'black' ? 'k' : name[0];
 }
 

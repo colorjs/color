@@ -207,8 +207,8 @@ describe('Color tests', function () {
 });
 
 
-describe('Performance', function () {
-	describe('Cross-conversion', function () {
+describe('Comparison', function () {
+	describe('Performance', function () {
 		it('Color', function () {
 			var color = new Color1('red');
 
@@ -233,14 +233,28 @@ describe('Performance', function () {
 		});
 	});
 
+
+	describe('Back and forth conversion', function () {
+		it('Color', function () {
+			var c = Color1("rgb(10, 100, 60)");
+			c.hslArray();
+			c.hue();
+			c.hue();
+			assert.deepEqual(c.rgbArray(), [10, 100, 60]);
+		});
+		it('Color2', function () {
+			var c = Color("rgb(10, 100, 60)");
+			c.hslArray();
+			c.hue();
+			c.hue();
+			assert.deepEqual(c.rgbArray(), [10, 100, 60]);
+		});
+	});
+
 });
 
 
 describe.skip('Color2 tests', function () {
-	it.skip('back and forth transforms', function () {
-
-	});
-
 	it('fromNumber', function () {
 		assert.deepEqual(Color().fromNumber(123).rgbArray(), []);
 		assert.deepEqual(Color().fromNumber(123, 'hsl').hslArray(), []);
