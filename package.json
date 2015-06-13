@@ -1,7 +1,7 @@
 {
   "name": "color2",
   "description": "Stateful implementation of color",
-  "version": "0.7.3",
+  "version": "0.8.0",
   "author": "Heather Arthur <fayearthur@gmail.com>",
   "contributors": "Dyma Ywanov <dfcreative@gmail.com>",
   "repository": {
