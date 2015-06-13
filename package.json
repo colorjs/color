@@ -20,7 +20,7 @@
     "color-stringify": "^1.0.1",
     "left-pad": "latest",
     "mumath": "^1.0.2",
-    "mustring": "0.0.5",
+    "mustring": "^0.0.5",
     "mutype": "^0.3.5",
     "sliced": "latest"
   },
