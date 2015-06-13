@@ -9,6 +9,7 @@ module.exports = Color;
 
 var parse = require('color-parse');
 var stringify = require('color-stringify');
+var manipulate = require('color-manipulate');
 var spaces = require('color-space');
 var names = require('color-name');
 var slice = require('sliced');
@@ -226,8 +227,8 @@ proto.toJSON = function (spaceName) {
 
 
 /** HEX number getter/setter */
-proto.fromNumber = function (int, space) {
-	var values = pad(int.toString(16), 6, 0).split(/(..)/).filter(Boolean);
+proto.fromNumber = function (val, space) {
+	var values = pad(val.toString(16), 6, 0).split(/(..)/).filter(Boolean);
 	return this.fromArray(values, space);
 };
 

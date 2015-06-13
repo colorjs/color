@@ -2,9 +2,10 @@
 
 A stateful implementation of [harthur/color](http://github.com/harthur/color):
 
-* new [color spaces](http://github.com/dfcreative/color-space)
-* new [manipulation & measurement functions](http://github.com/dfcreative/color-manipulate)
-* better [parsing of input values](http://github.com/dfcreative/color-parse)
+* additional [color spaces](http://github.com/dfcreative/color-space)
+* new [manipulation functions](http://github.com/dfcreative/color-manipulate)
+* new [measurement functions](http://github.com/dfcreative/color-manipulate)
+* [parsing of input values](http://github.com/dfcreative/color-parse)
 * optimized [performance](http://TODOtests)
 * normalized [API](#API).
 
@@ -29,7 +30,7 @@ API is compatible as much as possible with [harthur/color](http://github.com/har
 
 ### new Color(argument, space?)
 
-Create a color instance from any `argument`: a string, an array, an object, a number or other a color instance. An optional `space` string can be passed to specify parsing target.
+Create instance from any `argument`: string, array, object, number or other color instance. `space` string can be passed to specify parsing target.
 
 ```js
 var color = new Color('red');
@@ -171,7 +172,7 @@ color.luminance(); //1.123
 
 ## Contribute
 
-The goal of the project is to provide fast and extensible color class with intuitive API. Please make sure your issue does not belong to a subpackage: [color-stringify](http://github.com/dfcreative/color-stringify), [color-manipulate](http://github.com/dfcreative/color-manipulate), [color-parse](http://github.com/dfcreative/color-parse), and only then [contribute](https://github.com/dfcreative/color/issues/new/).
+The goal of the project is to provide fast and extensible color class with intuitive API. Please make sure your issue does not belong to a subpackage: [color-stringify](http://github.com/dfcreative/color-stringify), [color-parse](http://github.com/dfcreative/color-parse), [color-manipulate](http://github.com/dfcreative/color-manipulate), [color-blend](http://github.com/dfcreative/color-blend), [color-measure](http://github.com/dfcreative/color-measure), and only then [contribute](https://github.com/dfcreative/color/issues/new/).
 
 
 [![NPM](https://nodei.co/npm/color2.png?downloads=true&downloadRank=true&stars=true)](https://nodei.co/npm/color2/)
