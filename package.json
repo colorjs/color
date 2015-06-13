@@ -1,6 +1,6 @@
 {
-  "name": "colour",
-  "description": "Color conversion and manipulation with CSS string support",
+  "name": "color2",
+  "description": "Stateful implementation of color",
   "version": "0.7.3",
   "author": "Heather Arthur <fayearthur@gmail.com>",
   "contributors": "Dyma Ywanov <dfcreative@gmail.com>",
