@@ -473,6 +473,24 @@ proto.clone = function () {
 };
 
 
+/**
+ * Create manipulation methods
+ */
+Object.keys(manipulate).forEach(function (name) {
+	proto[name] = function (a,b) {
+		return manipulate[name](this, a, b);
+	};
+});
+
+
+/** Some color compatibility bindings */
+proto.rotate = proto.spin;
+proto.negate = proto.invert;
+proto.greyscale = proto.grayscale;
+proto.clearer = proto.fadeout;
+proto.opaquer = proto.fadein;
+
+
 //gray
 //toFilter
 //isValid
