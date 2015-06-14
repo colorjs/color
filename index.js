@@ -111,7 +111,7 @@ proto.parse = function (arg, space) {
 proto.fromString = function (cstr) {
 	var res = parse(cstr);
 	this.setValues(res.values, res.space);
-	this.setAlpha(res.alpha);
+	this.alpha(res.alpha);
 	return this;
 };
 
@@ -120,7 +120,7 @@ proto.toString = function (type) {
 	var values = this.toArray(spaces[type] ? type : 'rgb');
 	values = round(values);
 	if (this._alpha < 1) {
-		values.push(this.getAlpha());
+		values.push(this.alpha());
 	}
 	return stringify(values, type);
 };
@@ -138,7 +138,7 @@ proto.fromArray = function (values, spaceName) {
 
 	//get alpha
 	if (values.length > space.channel.length) {
-		this.setAlpha(values[space.channel.length]);
+		this.alpha(values[space.channel.length]);
 		values = slice(values, 0, space.channel.length);
 	}
 
@@ -222,7 +222,7 @@ proto.fromJSON = function (obj, spaceName) {
 	}), space.name);
 
 	var alpha = obj.a !== undefined ? obj.a : obj.alpha;
-	if (alpha !== undefined) this.setAlpha(alpha);
+	if (alpha !== undefined) this.alpha(alpha);
 
 	return this;
 };
@@ -386,7 +386,7 @@ proto.defineSpace = function (name, space) {
 
 
 /**
- * Create per-space per-channel API
+ * Create per-space API
  */
 Object.keys(spaces).forEach(function (name) {
 	proto.defineSpace(name, spaces[name]);
@@ -397,16 +397,12 @@ Object.keys(spaces).forEach(function (name) {
  * Alpha getter / setter
  */
 proto.alpha = function (value) {
-	if (arguments.length) return this.setAlpha(value);
-	return this.getAlpha();
-};
-proto.setAlpha = function (value) {
-	this._alpha = between(value, 0, 1);
-	return this;
-};
-
-proto.getAlpha = function () {
-	return this._alpha;
+	if (arguments.length) {
+		this._alpha = between(value, 0, 1);
+		return this;
+	} else {
+		return this._alpha;
+	}
 };
 
 
@@ -419,14 +415,14 @@ proto.defineSpace('hsla', spaces.hsl);
 proto.rgbaArray = function () {
 	var res = this.rgbArray.apply(this, arguments);
 	if (isArray(res)) {
-		res.push(this.getAlpha());
+		res.push(this.alpha());
 	}
 	return res;
 };
 proto.hslaArray = function () {
 	var res = this.rgbArray.apply(this, arguments);
 	if (isArray(res)) {
-		res.push(this.getAlpha());
+		res.push(this.alpha());
 	}
 	return res;
 };
