@@ -21,7 +21,6 @@ var isNumber = require('mutype/is-number');
 var loop = require('mumath/loop');
 var round = require('mumath/round');
 var between = require('mumath/between');
-var capfirst = require('mustring/capfirst');
 
 
 
