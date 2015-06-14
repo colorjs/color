@@ -28,6 +28,7 @@ color.hslString();  // "hsla(262, 59%, 81%, 0.5)"
 
 API is compatible with [harthur/color](http://github.com/harthur/color).
 
+
 ### Setters
 
 ```js
@@ -39,13 +40,13 @@ var color = Color().rgb({r: 10, g: 20, b: 30});
 var color = Color().rgb(0xAAFFDD);
 ```
 
-Pass into `Color()` any CSS color string, array, number or a hash of values. Also load in color values with `rgb()`, `hsl()`, `hsv()`, `hwb()`, `cmyk()`, `lab()`, [etc](http://npmjs.org/package/color-space).
+Pass into `Color()` any CSS color string, array, number or a hash of values. Also load in color values with `rgb()`, `hsl()`, `hsv()`, `hwb()`, `cmyk()`, `xyz()`, `lab()`, `lch()`, `huslp()`, [etc](http://npmjs.org/package/color-space).
 
 ```js
 color.alpha(0.5);
 ```
 
-Set the values for individual channels with `alpha`, `red`, `green`, `blue`, `hue`, `saturation` (hsl), `saturationv` (hsv), `lightness`, `whiteness`, `blackness`, `cyan`, `magenta`, `yellow`, `black`.
+Set the value for individual channel: `alpha`, `red`, `green`, `blue`, `hue`, `saturation` (hsl), `saturationv` (hsv), `lightness`, `whiteness`, `blackness`, `cyan`, `magenta`, `yellow` or `black`.
 
 
 ### Getters
@@ -57,116 +58,80 @@ color.rgbString();	// `rgba(10, 20, 30, .6)`
 color.red();		// 10
 ```
 
-### color.toString(space?)
+Get a hash, array or string for `rgb`, `hsl`, `hsv`, `cmyk`, [etc](http://npmjs.org/package/color-space). Also get the value for individual channel.
 
-Set color from the `string` or transform to string.
-Parsing is provided by [color-parse](http://npmjs.org/package/color-parse).
-Serializing is provided by [color-stringify](http://npmjs.org/package/color-stringify).
+
+### Manipulations
 
 ```js
-var color = Color();
-color.fromString('hwb(380deg, 40.1%, -12.5%, .5)').toString(); //hwb(20, 40%, 0%, 0.5)
+color.negate();					// rgb(0, 100, 255) -> rgb(255, 155, 0)
+
+color.lighten(0.5);				// hsl(100, 50%, 50%) -> hsl(100, 50%, 75%)
+color.darken(0.5);				// hsl(100, 50%, 50%) -> hsl(100, 50%, 25%)
+
+color.saturate(0.5);			// hsl(100, 50%, 50%) -> hsl(100, 75%, 50%)
+color.desaturate(0.5);			// hsl(100, 50%, 50%) -> hsl(100, 25%, 50%)
+color.greyscale();				// #5CBF54 -> #969696
+
+color.whiten(0.5);				// hwb(100, 50%, 50%) -> hwb(100, 75%, 50%)
+color.blacken(0.5);				// hwb(100, 50%, 50%) -> hwb(100, 50%, 75%)
+
+color.clearer(0.5);				// rgba(10, 10, 10, 0.8) -> rgba(10, 10, 10, 0.4)
+color.opaquer(0.5);				// rgba(10, 10, 10, 0.8) -> rgba(10, 10, 10, 1.0)
+
+color.rotate(180);				// hsl(60, 20%, 20%) -> hsl(240, 20%, 20%)
+color.rotate(-90);				// hsl(60, 20%, 20%) -> hsl(330, 20%, 20%)
+
+color.mix(Color("yellow"));		// cyan -> rgb(128, 255, 128)
+color.mix(Color("yellow"), 0.3);// cyan -> rgb(77, 255, 179)
+
+// chaining
+color.green(100).greyscale().lighten(0.6)
 ```
 
-### color.toArray(space?)
+All the manipulations from [color-manipulate](http://npmjs.org/package/color-manipulate) package.
 
-Set color from the list of values. If `space` is undefined, it is taken as current space.
 
-```js
-var color = Color();
-color.fromArray([10, 30, 25], 'rgb').toArray('hsl'); //[165, 50, 8]
-```
-
-### color.toJSON(space?)
-
-Set color from an `object`. If `space` is undefined, it will be detected from the passed object.
+### Utils
 
 ```js
-var color = Color();
-color.fromJSON({r: 10, g: 30, b:25, a: 0.5}).hslString('hsl'); //hsla(165, 50%, 8%, 0.5)
-```
+//Universal parser
+color.parse('hwb(380deg, 40.1%, -12.5%, .5)');
 
-### color.toNumber(space?)
+//Typed parsing/serializing
+color.fromString('rgb(10, 20, 30)');
+color.toString('hwb');
 
-Get/set values from the integer.
+color.fromArray([10, 20, 30], 'rgb');
+color.toArray('rgb');
 
+color.fromJSON({red: 10, green: 20, blue: 30});
+color.toJSON();
 
-### color.values(argument, space?)
-### color.getValues(space?)
+color.fromNumber(0xAABBCC, 'rgb');
+color.toNumber();
 
-Get/set current space values.
+//JSON-like API
+Color.parse('rgb(10, 20, 30)');
+Color.stringify(color);
 
-```js
-```
+//State API
+color.setValues([10, 20, 30], 'rgb');
+color.getValues('hsl');
 
-### color.space()
-### color.getSpace()
-### color.setSpace(space, values?)
+color.getSpace();
+color.setSpace('rgb');
 
-Get/set current color space.
+color.setChannel('lab', 1, 25);
+color.getChannel('lab', 1);
 
-```js
-```
+//Special formats
+color.hexString();		//#AABBCC
+color.percentString();	//rgb(10%, 20%, 100%);
+color.keyword();		//red
 
-### color.channel()
-### color.getChannel(space, idx)
-
-Get/set space channel defined by index starting with `0`.
-
-```js
-Color('hsl(red, 10%, 10%)').setChannel('hsl', 0, 40).toString(); //hsl(40, 10%, 10%)
-```
-
-### color.channel()
-### color.getAlpha()
-### color.setAlpha(value)
-
-Get/set alpha.
-
-```js
-Color('rgb(0, 0, 0)').alpha(0.4).rgbString(); //rgba(0, 0, 0, 0.4)
-```
-
-### color.<space>()
-### color.get<space>()
-### color.set<space>()
-### color.<space>Array()
-### color.<space>String()
-### color.<space>Number()
-### color.<channel>()
-
-Color exposes methods for each space provided by [color-space](http://npmjs.org/package/color-space) package: `rgb`, `hsl`, `hsv`, `hwb`, `cmyk`, `cmy`, `xyz`, `xyy`, `lab`, `lch`, `luv`, `lchuv`, `husl`, `huslp`, `labh`, `lms`, `yuv`, `yiq`, `cubehelix`, `gray`.
-
-```js
-var color = Color('rgb(120,120,120)');
-
-```
-
-### color.hexString()
-### color.percentString()
-### color.keyword()
-
-### color.clone()
-
-Return a new color instance the clone of the current one.
-
-### Color.parse(argument, space?)
-### Color.stringify(color, space?)
-
-Static methods providing JSON-like API to parse or stringify color object.
-
-
-### color.<manipulation>()
-### color.<measure>()
-
-Color provides all the manipulations from the [color-manipulate](http://npmjs.org/package/color-manipulate) package.
-
-Example:
-
-```js
-var color = new Color('gray');
-color.lighten(0.2).saturate(0.5);
-color.luminance(); //1.123
+//Return clone
+color.clone();
 ```
 
 
