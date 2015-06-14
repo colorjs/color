@@ -500,6 +500,7 @@ proto.dark = proto.isDark;
 proto.light = proto.isLight;
 
 
+//TODO:
 //gray
 //toFilter
 //isValid
