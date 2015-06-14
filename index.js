@@ -192,7 +192,7 @@ proto.fromJSON = function (obj, spaceName) {
 	//find space by the most channel match
 	if (!space) {
 		var maxChannelsMatched = 0, channelsMatched = 0;
-		Object.keys(spaces).forEach(function (key, i) {
+		Object.keys(spaces).forEach(function (key) {
 			channelsMatched = spaces[key].channel.reduce(function (prev, curr) {
 				if (obj[curr] !== undefined || obj[ch(curr)] !== undefined) {
 					return prev+1;
@@ -357,9 +357,6 @@ proto.setChannel = function (space, idx, value) {
 
 /** Define named set of methods for a space */
 proto.defineSpace = function (name, space) {
-	var setName = 'set' + capfirst(name);
-	var getName = 'get' + capfirst(name);
-
 	//create precisions
 	space.precision = space.channel.map(function (ch, idx) {
 		return Math.abs(space.max[idx] - space.min[idx]) > 1 ? 1 : 0.01;
