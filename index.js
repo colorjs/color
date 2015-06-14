@@ -393,6 +393,17 @@ proto.defineSpace = function (name, space) {
 		return this.toArray(name);
 	};
 
+	// .rgbaArray(), .hslaArray
+	if (name === 'rgb' || name === 'hsl') {
+		proto[name + 'aArray'] = function () {
+			var res = this[name + 'Array'].apply(this, arguments);
+			if (isArray(res)) {
+				res.push(this.alpha());
+			}
+			return res;
+		};
+	}
+
 	// .red(), .green(), .blue()
 	space.channel.forEach(function (cname, cidx) {
 		if (proto[cname]) {
@@ -430,27 +441,6 @@ proto.alpha = function (value) {
 	}
 };
 
-
-/**
- * Rgba, hsla getter/setter. Specific array wrappers to add alpha.
- */
-proto.defineSpace('rgba', spaces.rgb);
-proto.defineSpace('hsla', spaces.hsl);
-
-proto.rgbaArray = function () {
-	var res = this.rgbArray.apply(this, arguments);
-	if (isArray(res)) {
-		res.push(this.alpha());
-	}
-	return res;
-};
-proto.hslaArray = function () {
-	var res = this.hslArray.apply(this, arguments);
-	if (isArray(res)) {
-		res.push(this.alpha());
-	}
-	return res;
-};
 
 /** Hex string parser is the same as simple parser */
 proto.hexString = function (str) {
