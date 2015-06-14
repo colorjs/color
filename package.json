@@ -13,6 +13,7 @@
   "main": "index.js",
   "dependencies": {
     "color-manipulate": "^1.0.1",
+    "color-measure": "^1.0.1",
     "color-name": "^1.0.0",
     "color-parse": "^1.0.2",
     "color-space": "^1.0.0",

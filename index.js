@@ -10,6 +10,7 @@ module.exports = Color;
 var parse = require('color-parse');
 var stringify = require('color-stringify');
 var manipulate = require('color-manipulate');
+var measure = require('color-measure');
 var spaces = require('color-space');
 var names = require('color-name');
 var slice = require('sliced');
@@ -476,13 +477,27 @@ Object.keys(manipulate).forEach(function (name) {
 	};
 });
 
-
 /** Some color compatibility bindings */
 proto.rotate = proto.spin;
 proto.negate = proto.invert;
 proto.greyscale = proto.grayscale;
 proto.clearer = proto.fadeout;
 proto.opaquer = proto.fadein;
+
+
+/**
+ * Create measure methods
+ */
+Object.keys(measure).forEach(function (name) {
+	proto[name] = function (a, b) {
+		return measure[name](this, a, b);
+	};
+});
+
+/** Some color compatibility bindings */
+proto.luminosity = proto.luminance;
+proto.dark = proto.isDark;
+proto.light = proto.isLight;
 
 
 //gray

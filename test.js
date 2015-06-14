@@ -133,7 +133,7 @@ describe('Color tests', function () {
 		assert.equal(Color("rgb(10, 30, 25)").toNumber(), 0xA1E19);
 	});
 
-	it.skip('Metrics', function () {
+	it('Metrics', function () {
 		assert.equal(Color("white").luminosity(), 1);
 		assert.equal(Color("black").luminosity(), 0);
 		assert.equal(Color("red").luminosity(), 0.2126);

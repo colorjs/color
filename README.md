@@ -114,7 +114,7 @@ color.green(100).greyscale().lighten(0.6)
 Color.parse('rgb(10, 20, 30)');
 Color.stringify(color);				//rgba(10, 20, 30, 0.8)
 
-//Current space API
+//Technical methods
 color.setValues([10, 20, 30]);
 color.getValues('hsl');				//[10, 20, 30]
 
