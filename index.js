@@ -12,7 +12,6 @@ var stringify = require('color-stringify');
 var manipulate = require('color-manipulate');
 var measure = require('color-measure');
 var spaces = require('color-space');
-var names = require('color-name');
 var slice = require('sliced');
 var pad = require('left-pad');
 var isString = require('mutype/is-string');
@@ -193,7 +192,7 @@ proto.fromJSON = function (obj, spaceName) {
 	//find space by the most channel match
 	if (!space) {
 		var maxChannelsMatched = 0, channelsMatched = 0;
-		for ( var key in spaces ) {
+		Object.keys(spaces).forEach(function (key, i) {
 			channelsMatched = spaces[key].channel.reduce(function (prev, curr) {
 				if (obj[curr] !== undefined || obj[ch(curr)] !== undefined) {
 					return prev+1;
@@ -208,8 +207,10 @@ proto.fromJSON = function (obj, spaceName) {
 				space = spaces[key];
 			}
 
-			if (channelsMatched >= 3) break;
-		}
+			if (channelsMatched >= 3) {
+				return;
+			}
+		});
 	}
 
 	//if no space for a JSON found
@@ -223,7 +224,9 @@ proto.fromJSON = function (obj, spaceName) {
 	}), space.name);
 
 	var alpha = obj.a !== undefined ? obj.a : obj.alpha;
-	if (alpha !== undefined) this.alpha(alpha);
+	if (alpha !== undefined) {
+		this.alpha(alpha);
+	}
 
 	return this;
 };
@@ -264,7 +267,9 @@ proto.toNumber = function (space) {
  * Current space values
  */
 proto.values = function () {
-	if (arguments.length) return this.setValues.apply(this, arguments);
+	if (arguments.length) {
+		return this.setValues.apply(this, arguments);
+	}
 	return this.getValues.apply(this, arguments);
 };
 
@@ -293,7 +298,9 @@ proto.setValues = proto.parse;
  * Current space
  */
 proto.space = function () {
-	if (arguments.length) return this.setSpace.apply(this, arguments);
+	if (arguments.length) {
+		return this.setSpace.apply(this, arguments);
+	}
 	return this.getSpace.apply(this, arguments);
 };
 
@@ -304,11 +311,17 @@ proto.getSpace = function () {
 
 /** Switch to a new space with optional new values */
 proto.setSpace = function (space, values) {
-	if (!space || !spaces[space]) throw Error('Cannot set space ' + space);
+	if (!space || !spaces[space]) {
+		throw Error('Cannot set space ' + space);
+	}
 
-	if (space === this._space) return this;
+	if (space === this._space) {
+		return this;
+	}
 
-	if (values) return this.setValues(values, space);
+	if (values) {
+		return this.setValues(values, space);
+	}
 
 	//just convert current values to a new space
 	this._values = spaces.xyz[space](this._xyz);
@@ -355,7 +368,9 @@ proto.defineSpace = function (name, space) {
 	// .rgb()
 	proto[name] = function (values) {
 		if (arguments.length) {
-			if (arguments.length > 1) return this.setValues(slice(arguments), name);
+			if (arguments.length > 1) {
+				return this.setValues(slice(arguments), name);
+			}
 			return this.setValues(values, name);
 		} else {
 			return this.toJSON(name);
@@ -364,19 +379,25 @@ proto.defineSpace = function (name, space) {
 
 	// .rgbString()
 	proto[name + 'String'] = function (cstr) {
-		if (cstr) return this.fromString(cstr);
+		if (cstr) {
+			return this.fromString(cstr);
+		}
 		return this.toString(name);
 	};
 
 	// .rgbArray()
 	proto[name + 'Array'] = function (values) {
-		if (arguments.length) return this.fromArray(values);
+		if (arguments.length) {
+			return this.fromArray(values);
+		}
 		return this.toArray(name);
 	};
 
 	// .red(), .green(), .blue()
 	space.channel.forEach(function (cname, cidx) {
-		if (proto[cname]) return;
+		if (proto[cname]) {
+			return;
+		}
 		proto[cname] = function (value) {
 			if (arguments.length) {
 				return this.setChannel(name, cidx, value);
