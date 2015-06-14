@@ -26,27 +26,25 @@ color.hslString();  // "hsla(262, 59%, 81%, 0.5)"
 
 ## API
 
-API is compatible with [harthur/color](http://github.com/harthur/color).
-
 
 ### Setters
 
 ```js
 var color = Color([10, 20, 30, .6]);
 var color = Color('rgba(10, 20, 30, .8)');
+
 var color = Color().rgb([10, 20, 30]);
 var color = Color().rgb(10, 20, 30);
 var color = Color().rgb({r: 10, g: 20, b: 30});
 var color = Color().rgb(0xAAFFDD);
+
+color.alpha(0.5);
+color.red(12);
 ```
 
 Pass into `Color()` any CSS color string, array, number or a hash of values. Also load in color values with `rgb()`, `hsl()`, `hsv()`, `hwb()`, `cmyk()`, `xyz()`, `lab()`, `lch()`, `huslp()`, [etc](http://npmjs.org/package/color-space).
 
-```js
-color.alpha(0.5);
-```
-
-Set the value for individual channel: `alpha`, `red`, `green`, `blue`, `hue`, `saturation` (hsl), `saturationv` (hsv), `lightness`, `whiteness`, `blackness`, `cyan`, `magenta`, `yellow` or `black`.
+Also set the value for individual channel: `alpha`, `red`, `green`, `blue`, `hue`, `saturation` (hsl), `saturationv` (hsv), `lightness`, `whiteness`, `blackness`, `cyan`, `magenta`, `yellow` or `black`.
 
 
 ### Getters
@@ -54,8 +52,10 @@ Set the value for individual channel: `alpha`, `red`, `green`, `blue`, `hue`, `s
 ```js
 color.rgb();		// {r: 10, g:20, b:30}
 color.rgbArray();	// [10, 20, 30]
-color.rgbString();	// `rgba(10, 20, 30, .6)`
+color.rgbString();	// rgba(10, 20, 30, .6)
+
 color.red();		// 10
+color.alpha();		// 10
 ```
 
 Get a hash, array or string for `rgb`, `hsl`, `hsv`, `cmyk`, [etc](http://npmjs.org/package/color-space). Also get the value for individual channel.
@@ -89,16 +89,14 @@ color.mix(Color("yellow"), 0.3);// cyan -> rgb(77, 255, 179)
 color.green(100).greyscale().lighten(0.6)
 ```
 
-All the manipulations from [color-manipulate](http://npmjs.org/package/color-manipulate) package.
-
 
 ### Utils
 
 ```js
-//Universal parser
+//Parse anything
 color.parse('hwb(380deg, 40.1%, -12.5%, .5)');
 
-//Typed parsing/serializing
+//Typed
 color.fromString('rgb(10, 20, 30)');
 color.toString('hwb');
 
@@ -111,7 +109,7 @@ color.toJSON();
 color.fromNumber(0xAABBCC, 'rgb');
 color.toNumber();
 
-//JSON-like API
+//JSON-like
 Color.parse('rgb(10, 20, 30)');
 Color.stringify(color);
 
@@ -130,7 +128,7 @@ color.hexString();		//#AABBCC
 color.percentString();	//rgb(10%, 20%, 100%);
 color.keyword();		//red
 
-//Return clone
+//Clone
 color.clone();
 ```
 
