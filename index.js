@@ -318,16 +318,26 @@ proto.setSpace = function (space, values) {
 
 
 /** Channel getter/setter */
-proto.channel = function (space, idx, value) {
+proto.channel = function () {
 	if (arguments.length > 2) {
-		this.setSpace(space);
-		this._values[idx] = cap(value, space, idx);
-		this._xyz = spaces[space].xyz(this._values);
-		return this;
+		return this.setChannel.apply(this, arguments);
 	} else {
-		this.setSpace(space);
-		return this._values[idx];
+		return this.getChannel.apply(this, arguments);
 	}
+};
+
+/** Get channel value */
+proto.getChannel = function (space, idx) {
+	this.setSpace(space);
+	return this._values[idx];
+};
+
+/** Set current channel value */
+proto.setChannel = function (space, idx, value) {
+	this.setSpace(space);
+	this._values[idx] = cap(value, space, idx);
+	this._xyz = spaces[space].xyz(this._values);
+	return this;
 };
 
 
@@ -368,10 +378,10 @@ proto.defineSpace = function (name, space) {
 		if (proto[cname]) return;
 		proto[cname] = function (value) {
 			if (arguments.length) {
-				return this.channel(name, cidx, value);
+				return this.setChannel(name, cidx, value);
 			}
 			else {
-				return round(this.channel(name, cidx), space.precision[cidx]);
+				return round(this.getChannel(name, cidx), space.precision[cidx]);
 			}
 		};
 	});
