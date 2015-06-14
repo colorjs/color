@@ -32,7 +32,7 @@ color.hslString();  // "hsla(262, 59%, 81%, 0.5)"
 ```js
 //Initial
 var color = Color([10, 20, 30, .6]);
-var color = Color().parse('hwb(380deg, 40.1%, -12.5%, .5)');
+var color = Color('hwb(380deg, 40.1%, -12.5%, .5)');
 
 //Per-space
 var color = Color().rgb([10, 20, 30]);
@@ -50,10 +50,10 @@ color.lightness(15);
 color.fromString('rgb(10, 20, 30)');
 color.fromArray([10, 20, 30], 'rgb');
 color.fromJSON({red: 10, green: 20, blue: 30});
-color.fromNumber(0xAABBCC);
+color.fromNumber(0xAABBCC, 'rgb');
 ```
 
-Spaces and channels are provided by [color-space](http://npmjs.org/package/color-space) package: `rgb`, `hsl`, `hsv`, `hwb`, `cmyk`, `lab`, `lch`, `luv`, `husl`, etc.
+Spaces and channels taken from [color-space](http://npmjs.org/package/color-space) package: `rgb`, `hsl`, `hsv`, `hwb`, `cmyk`, `lab`, `lch`, `luv`, `husl`, etc.
 
 
 ### Getters
@@ -80,7 +80,7 @@ color.toJSON('hsl');	//{h:10, s:20, l:30}
 color.toNumber('rgb');	//0xAABBCC
 ```
 
-Stringifying is provided by [color-stringify](http://npmjs.org/package/color-stringify) package: `hex`, `percent`, `keyword`, `rgb`, `hsl`, `hsv`, `hwb`, `cmyk`, etc.
+Stringify modes are from [color-stringify](http://npmjs.org/package/color-stringify) package: `hex`, `percent`, `keyword`, `rgb`, `hsl`, `hsv`, `hwb`, `cmyk`, etc.
 
 
 ### Manipulations
@@ -111,25 +111,28 @@ color.mix(Color("yellow"), 0.3);	// cyan → rgb(77, 255, 179)
 color.green(100).greyscale().lighten(0.6)
 ```
 
-Manipulations are provided by [color-manipulate](http://npmjs.org/package/color-manipulate) package.
+Manipulations are done by [color-manipulate](http://npmjs.org/package/color-manipulate) package.
 
 
 ### Utils
 
 ```js
-//JSON-like
+//Universal setter
+Color().parse('rgb(10, 20, 30)');
+
+//JSON-like API
 Color.parse('rgb(10, 20, 30)');
 Color.stringify(color);
 
-//State API
-color.setValues([10, 20, 30], 'rgb');
-color.getValues('hsl');
+//Current space API
+color.setValues([10, 20, 30]);
+color.getValues('hsl');				//[10, 20, 30]
 
-color.getSpace();
+color.getSpace();					//rgb
 color.setSpace('rgb');
 
+color.getChannel('red', 1);			//20
 color.setChannel('lab', 1, 25);
-color.getChannel('lab', 1);
 
 //Clone
 color.clone();
