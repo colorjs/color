@@ -445,7 +445,7 @@ proto.rgbaArray = function () {
 	return res;
 };
 proto.hslaArray = function () {
-	var res = this.rgbArray.apply(this, arguments);
+	var res = this.hslArray.apply(this, arguments);
 	if (isArray(res)) {
 		res.push(this.alpha());
 	}
