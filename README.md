@@ -1,11 +1,11 @@
 # Color2 [![Build Status](https://travis-ci.org/dfcreative/color.svg?branch=master)](https://travis-ci.org/dfcreative/color) [![Code Climate](https://codeclimate.com/github/dfcreative/color/badges/gpa.svg)](https://codeclimate.com/github/dfcreative/color) [![unstable](http://badges.github.io/stability-badges/dist/unstable.svg)](http://github.com/badges/stability-badges)
 
-A stateful implementation of [harthur/color](http://github.com/harthur/color).
+A stateful implementation of [harthur/color](http://github.com/harthur/color):
 
 * Additional [color spaces](http://github.com/dfcreative/color-space).
-* Standalone [manipulation functions](http://github.com/dfcreative/color-manipulate).
-* Standalone [measurement functions](http://github.com/dfcreative/color-manipulate).
-* Enhanced [parsing of input values](http://github.com/dfcreative/color-parse).
+* Standalone [manipulations](http://github.com/dfcreative/color-manipulate).
+* Standalone [metrics](http://github.com/dfcreative/color-manipulate).
+* Enhanced [parsing](http://github.com/dfcreative/color-parse).
 * Optimized [performance](http://TODOtests).
 * Normalized [API](#api).
 
