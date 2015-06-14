@@ -1,7 +1,7 @@
 {
   "name": "color2",
   "description": "Stateful implementation of color",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "author": "Dyma Ywanov <dfcreative@gmail.com>",
   "repository": {
     "type": "git",
