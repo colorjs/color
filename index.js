@@ -27,11 +27,12 @@ var capfirst = require('mustring/capfirst');
 
 /**
  * Color class.
- * It innerly keeps updated xyz values on order to preserve quality.
  * @constructor
  */
 function Color (arg, space) {
-	if (!(this instanceof Color)) return new Color(arg);
+	if (!(this instanceof Color)) {
+		return new Color(arg);
+	}
 
 	var self = this;
 
@@ -39,6 +40,8 @@ function Color (arg, space) {
 	self._values = [0,0,0];
 	self._space = 'rgb';
 	self._alpha = 1;
+
+	// keep xyz values to preserve quality
 	self._xyz = [0,0,0];
 
 	//parse argument
@@ -77,7 +80,9 @@ proto.parse = function (arg, space) {
 		//12, 25, 47 [, space]
 		if (arguments.length > 2) {
 			var args = slice(arguments);
-			if (isString(args[args.length - 1])) space = args.pop();
+			if (isString(args[args.length - 1])) {
+				space = args.pop();
+			}
 			self.parse(args, space);
 		}
 		//123445 [, space]
@@ -114,14 +119,18 @@ proto.toString = function (type) {
 	type = type || this.getSpace();
 	var values = this.toArray(spaces[type] ? type : 'rgb');
 	values = round(values);
-	if (this._alpha < 1) values.push(this.getAlpha());
+	if (this._alpha < 1) {
+		values.push(this.getAlpha());
+	}
 	return stringify(values, type);
 };
 
 
 /** Array setter/getter */
 proto.fromArray = function (values, spaceName) {
-	if (!spaceName || !spaces[spaceName]) spaceName = this._space;
+	if (!spaceName || !spaces[spaceName]) {
+		spaceName = this._space;
+	}
 
 	this._space = spaceName;
 
@@ -185,8 +194,12 @@ proto.fromJSON = function (obj, spaceName) {
 		var maxChannelsMatched = 0, channelsMatched = 0;
 		for ( var key in spaces ) {
 			channelsMatched = spaces[key].channel.reduce(function (prev, curr) {
-				if (obj[curr] !== undefined || obj[ch(curr)] !== undefined) return prev+1;
-				else return prev;
+				if (obj[curr] !== undefined || obj[ch(curr)] !== undefined) {
+					return prev+1;
+				}
+				else {
+					return prev;
+				}
 			}, 0);
 
 			if (channelsMatched > maxChannelsMatched) {
@@ -199,10 +212,12 @@ proto.fromJSON = function (obj, spaceName) {
 	}
 
 	//if no space for a JSON found
-	if (!space) throw Error('Cannot detect space.');
+	if (!space) {
+		throw Error('Cannot detect space.');
+	}
 
 	//for the space found set values
-	this.fromArray(space.channel.map(function (channel, i) {
+	this.fromArray(space.channel.map(function (channel) {
 		return obj[channel] !== undefined ? obj[channel] : obj[ch(channel)];
 	}), space.name);
 
@@ -224,7 +239,9 @@ proto.toJSON = function (spaceName) {
 		result[ch(channel)] = values[i];
 	});
 
-	if (this._alpha < 1) result.a = this._alpha;
+	if (this._alpha < 1) {
+		result.a = this._alpha;
+	}
 
 	return result;
 };
@@ -332,22 +349,13 @@ proto.defineSpace = function (name, space) {
 	});
 
 	// .rgb()
-	proto[name] = function () {
+	proto[name] = function (values) {
 		if (arguments.length) {
-			return this[setName].apply(this, arguments);
+			if (arguments.length > 1) return this.setValues(slice(arguments), name);
+			return this.setValues(values, name);
 		} else {
-			return this[getName]();
+			return this.toJSON(name);
 		}
-	};
-
-	// .setRgb()
-	proto[setName] = function (values) {
-		if (arguments.length > 1) return this.setValues(slice(arguments), name);
-		return this.setValues(values, name);
-	};
-	// .getRgb()
-	proto[getName] = function () {
-		return this.toJSON(name);
 	};
 
 	// .rgbString()
@@ -410,12 +418,16 @@ proto.defineSpace('hsla', spaces.hsl);
 
 proto.rgbaArray = function () {
 	var res = this.rgbArray.apply(this, arguments);
-	res.push(this.getAlpha());
+	if (isArray(res)) {
+		res.push(this.getAlpha());
+	}
 	return res;
 };
 proto.hslaArray = function () {
 	var res = this.rgbArray.apply(this, arguments);
-	res.push(this.getAlpha());
+	if (isArray(res)) {
+		res.push(this.getAlpha());
+	}
 	return res;
 };
 
@@ -506,13 +518,3 @@ function cap(value, spaceName, idx) {
 		return between(value, space.min[idx], space.max[idx]);
 	}
 }
-
-
-/**
- * Manipulation methods.
- */
-// Object.keys(manipulate).forEach(function (name) {
-// 	proto[name] = function () {
-// 		return manipulate[name].apply(this.rgbArray(), arguments);
-// 	};
-// });

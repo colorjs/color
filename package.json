@@ -2,11 +2,10 @@
   "name": "color2",
   "description": "Stateful implementation of color",
   "version": "0.8.0",
-  "author": "Heather Arthur <fayearthur@gmail.com>",
-  "contributors": "Dyma Ywanov <dfcreative@gmail.com>",
+  "author": "Dyma Ywanov <dfcreative@gmail.com>",
   "repository": {
     "type": "git",
-    "url": "http://github.com/harthur/color.git"
+    "url": "http://github.com/dfcreative/color.git"
   },
   "files": [
     "index.js"
@@ -16,7 +15,7 @@
     "color-manipulate": "^1.0.1",
     "color-name": "^1.0.0",
     "color-parse": "^1.0.2",
-    "color-space": ">=1.0.0",
+    "color-space": "^1.0.0",
     "color-stringify": "^1.0.1",
     "left-pad": "latest",
     "mumath": "^1.0.2",
