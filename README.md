@@ -1,10 +1,10 @@
 # Color2 [![Build Status](https://travis-ci.org/dfcreative/color.svg?branch=master)](https://travis-ci.org/dfcreative/color) [![Code Climate](https://codeclimate.com/github/dfcreative/color/badges/gpa.svg)](https://codeclimate.com/github/dfcreative/color) [![unstable](http://badges.github.io/stability-badges/dist/unstable.svg)](http://github.com/badges/stability-badges)
 
-A stateful implementation of [harthur/color](http://github.com/harthur/color):
+A stateful implementation of [harthur/color](http://github.com/harthur/color).
 
 * Additional [color spaces](http://github.com/dfcreative/color-space).
 * Standalone [manipulations](http://github.com/dfcreative/color-manipulate).
-* Standalone [metrics](http://github.com/dfcreative/color-manipulate).
+* Standalone [metrics](http://github.com/dfcreative/color-measure).
 * Enhanced [parsing](http://github.com/dfcreative/color-parse).
 * Optimized [performance](http://TODOtests).
 * Normalized [API](#api).
@@ -50,6 +50,9 @@ color.fromString('rgb(10, 20, 30)');
 color.fromArray([10, 20, 30], 'rgb');
 color.fromJSON({red: 10, green: 20, blue: 30});
 color.fromNumber(0xAABBCC, 'rgb');
+
+//Universal setter
+color.parse('rgb(10, 20, 30)');
 ```
 
 ### Getters
@@ -107,12 +110,9 @@ color.green(100).greyscale().lighten(0.6)
 ### Utils
 
 ```js
-//Universal setter
-Color().parse('rgb(10, 20, 30)');
-
 //JSON-like API
 Color.parse('rgb(10, 20, 30)');
-Color.stringify(color);
+Color.stringify(color);				//rgba(10, 20, 30, 0.8)
 
 //Current space API
 color.setValues([10, 20, 30]);
