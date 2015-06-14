@@ -1,13 +1,13 @@
-# Color [![Build Status](https://travis-ci.org/dfcreative/color.svg?branch=master)](https://travis-ci.org/dfcreative/color) [![Code Climate](https://codeclimate.com/github/dfcreative/color/badges/gpa.svg)](https://codeclimate.com/github/dfcreative/color) [![unstable](http://badges.github.io/stability-badges/dist/unstable.svg)](http://github.com/badges/stability-badges)
+# Color2 [![Build Status](https://travis-ci.org/dfcreative/color.svg?branch=master)](https://travis-ci.org/dfcreative/color) [![Code Climate](https://codeclimate.com/github/dfcreative/color/badges/gpa.svg)](https://codeclimate.com/github/dfcreative/color) [![unstable](http://badges.github.io/stability-badges/dist/unstable.svg)](http://github.com/badges/stability-badges)
 
-A stateful implementation of [harthur/color](http://github.com/harthur/color):
+A stateful implementation of [harthur/color](http://github.com/harthur/color).
 
-* additional [color spaces](http://github.com/dfcreative/color-space),
-* separate [manipulation functions](http://github.com/dfcreative/color-manipulate),
-* separate [measurement functions](http://github.com/dfcreative/color-manipulate),
-* enhanced [parsing of input values](http://github.com/dfcreative/color-parse),
-* optimized [performance](http://TODOtests),
-* normalized [API](#api).
+* Additional [color spaces](http://github.com/dfcreative/color-space).
+* Standalone [manipulation functions](http://github.com/dfcreative/color-manipulate).
+* Standalone [measurement functions](http://github.com/dfcreative/color-manipulate).
+* Enhanced [parsing of input values](http://github.com/dfcreative/color-parse).
+* Optimized [performance](http://TODOtests).
+* Normalized [API](#api).
 
 
 ## Usage
@@ -25,7 +25,6 @@ color.hslString();  // "hsla(262, 59%, 81%, 0.5)"
 ```
 
 ## API
-
 
 ### Setters
 
@@ -53,9 +52,6 @@ color.fromJSON({red: 10, green: 20, blue: 30});
 color.fromNumber(0xAABBCC, 'rgb');
 ```
 
-Spaces and channels taken from [color-space](http://npmjs.org/package/color-space) package: `rgb`, `hsl`, `hsv`, `hwb`, `cmyk`, `lab`, `lch`, `luv`, `husl`, etc.
-
-
 ### Getters
 
 ```js
@@ -79,9 +75,6 @@ color.toArray('rgb');	//[10, 20, 30]
 color.toJSON('hsl');	//{h:10, s:20, l:30}
 color.toNumber('rgb');	//0xAABBCC
 ```
-
-Stringify modes are from [color-stringify](http://npmjs.org/package/color-stringify) package: `hex`, `percent`, `keyword`, `rgb`, `hsl`, `hsv`, `hwb`, `cmyk`, etc.
-
 
 ### Manipulations
 
@@ -111,9 +104,6 @@ color.mix(Color("yellow"), 0.3);	// cyan → rgb(77, 255, 179)
 color.green(100).greyscale().lighten(0.6)
 ```
 
-Manipulations are done by [color-manipulate](http://npmjs.org/package/color-manipulate) package.
-
-
 ### Utils
 
 ```js
@@ -141,7 +131,16 @@ color.clone();
 
 ## Contribute
 
-The goal of the project is to provide fast and extensible color class with intuitive API. Please make sure your issue does not belong to a subpackage: [color-stringify](http://github.com/dfcreative/color-stringify), [color-parse](http://github.com/dfcreative/color-parse), [color-manipulate](http://github.com/dfcreative/color-manipulate), [color-blend](http://github.com/dfcreative/color-blend), [color-measure](http://github.com/dfcreative/color-measure), and only then [contribute](https://github.com/dfcreative/color/issues/new/).
+The goal of the project is to provide fast and extensible color class with intuitive API.
+Please make sure your issue does not belong to a subpackage:
+
+* [color-stringify](http://github.com/dfcreative/color-stringify),
+* [color-parse](http://github.com/dfcreative/color-parse),
+* [color-manipulate](http://github.com/dfcreative/color-manipulate),
+* [color-blend](http://github.com/dfcreative/color-blend),
+* [color-measure](http://github.com/dfcreative/color-measure),
+
+and then [contribute](https://github.com/dfcreative/color/issues/new/).
 
 
 [![NPM](https://nodei.co/npm/color2.png?downloads=true&downloadRank=true&stars=true)](https://nodei.co/npm/color2/)
