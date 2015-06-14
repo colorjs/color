@@ -130,7 +130,7 @@ describe('Color tests', function () {
 	});
 
 	it('Number getters', function () {
-		assert.equal(Color("rgb(10, 30, 25)").rgbNumber(), 0xA1E19)
+		assert.equal(Color("rgb(10, 30, 25)").toNumber(), 0xA1E19);
 	});
 
 	it.skip('Metrics', function () {

@@ -147,8 +147,12 @@ proto.fromArray = function (values, spaceName) {
 proto.toArray = function (space) {
 	var values;
 
+	if (!space) {
+		space = this._space;
+	}
+
 	//convert values to a target space
-	if (space && space !== this._space) {
+	if (space !== this._space) {
 		//enhance calc precision, like hsl ←→ hsv ←→ hwb or lab ←→ lch ←→ luv
 		if (this._space[0] === space[0]) {
 			values = spaces[this._space][space](this._values);
@@ -235,21 +239,6 @@ proto.fromNumber = function (val, space) {
 proto.toNumber = function (space) {
 	var values = this.toArray(space);
 	return (values[0] << 16) | (values[1] << 8) | values[2];
-};
-
-
-/**
- * Universal component setter and getter
- *
- * @param {string} component Whether space or channel identifier
- * @param {number|array|object|string} value A value for the component
- */
-proto.set = function (component, value) {
-	xxx;
-};
-
-proto.get = function (component) {
-	xxx;
 };
 
 
@@ -371,12 +360,6 @@ proto.defineSpace = function (name, space) {
 	proto[name + 'Array'] = function (values) {
 		if (arguments.length) return this.fromArray(values);
 		return this.toArray(name);
-	};
-
-	// .rgbNumber()
-	proto[name + 'Number'] = function (values) {
-		if (arguments.length) return this.fromNumber(values);
-		return this.toNumber(name);
 	};
 
 	// .red(), .green(), .blue()

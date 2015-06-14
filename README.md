@@ -26,28 +26,37 @@ color.hslString();  // "hsla(262, 59%, 81%, 0.5)"
 
 ## API
 
-API is compatible as much as possible with [harthur/color](http://github.com/harthur/color).
+API is compatible with [harthur/color](http://github.com/harthur/color).
 
-### new Color(argument, space?)
-
-Create instance from any `argument`: string, array, object, number or other color instance. `space` string can be passed to specify parsing target.
+### Setters
 
 ```js
-var color = new Color('red');
-color.red(); //255
+var color = Color([10, 20, 30, .6]);
+var color = Color('rgba(10, 20, 30, .8)');
+var color = Color().rgb([10, 20, 30]);
+var color = Color().rgb(10, 20, 30);
+var color = Color().rgb({r: 10, g: 20, b: 30});
+var color = Color().rgb(0xAAFFDD);
 ```
 
-### color.parse(argument, space?)
-
-Set current color from the `argument`, which can be anything. Pass an optional `space` string to specify parsing.
+Pass into `Color()` any CSS color string, array, number or a hash of values. Also load in color values with `rgb()`, `hsl()`, `hsv()`, `hwb()`, `cmyk()`, `lab()`, [etc](http://npmjs.org/package/color-space).
 
 ```js
-var color = new Color();
-color.parse('red');
-color.red(); //255
+color.alpha(0.5);
 ```
 
-### color.fromString(string)
+Set the values for individual channels with `alpha`, `red`, `green`, `blue`, `hue`, `saturation` (hsl), `saturationv` (hsv), `lightness`, `whiteness`, `blackness`, `cyan`, `magenta`, `yellow`, `black`.
+
+
+### Getters
+
+```js
+color.rgb();		// {r: 10, g:20, b:30}
+color.rgbArray();	// [10, 20, 30]
+color.rgbString();	// `rgba(10, 20, 30, .6)`
+color.red();		// 10
+```
+
 ### color.toString(space?)
 
 Set color from the `string` or transform to string.
@@ -59,7 +68,6 @@ var color = Color();
 color.fromString('hwb(380deg, 40.1%, -12.5%, .5)').toString(); //hwb(20, 40%, 0%, 0.5)
 ```
 
-### color.fromArray(values, space?)
 ### color.toArray(space?)
 
 Set color from the list of values. If `space` is undefined, it is taken as current space.
@@ -69,7 +77,6 @@ var color = Color();
 color.fromArray([10, 30, 25], 'rgb').toArray('hsl'); //[165, 50, 8]
 ```
 
-### color.fromJSON(object, space?)
 ### color.toJSON(space?)
 
 Set color from an `object`. If `space` is undefined, it will be detected from the passed object.
@@ -79,19 +86,13 @@ var color = Color();
 color.fromJSON({r: 10, g: 30, b:25, a: 0.5}).hslString('hsl'); //hsla(165, 50%, 8%, 0.5)
 ```
 
-### color.fromNumber(number)
 ### color.toNumber(space?)
 
 Get/set values from the integer.
 
-### color.get(component)
-### color.set(component, values)
-
-Get/set any component values.
 
 ### color.values(argument, space?)
 ### color.getValues(space?)
-### color.setValues(values, space?)
 
 Get/set current space values.
 
@@ -109,7 +110,6 @@ Get/set current color space.
 
 ### color.channel()
 ### color.getChannel(space, idx)
-### color.setChannel(space, idx, value)
 
 Get/set space channel defined by index starting with `0`.
 
