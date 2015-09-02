@@ -1,4 +1,4 @@
-# Color2 [![Build Status](https://travis-ci.org/dfcreative/color.svg)](https://travis-ci.org/dfcreative/color) [![Code Climate](https://codeclimate.com/github/dfcreative/color/badges/gpa.svg)](https://codeclimate.com/github/dfcreative/color) [![unstable](http://badges.github.io/stability-badges/dist/unstable.svg)](http://github.com/badges/stability-badges)
+# Color2 [![Build Status](https://travis-ci.org/dfcreative/color.svg)](https://travis-ci.org/dfcreative/color) [![Code Climate](https://codeclimate.com/github/dfcreative/color/badges/gpa.svg)](https://codeclimate.com/github/dfcreative/color) [![stable](http://badges.github.io/stability-badges/dist/stable.svg)](http://github.com/badges/stability-badges)
 
 A stateful implementation of [harthur/color](http://github.com/harthur/color).
 
@@ -33,6 +33,7 @@ color.hslString();  // "hsla(262, 59%, 81%, 0.5)"
 //Initial
 var color = Color([10, 20, 30, .6]);
 var color = Color('hwb(380deg, 40.1%, -12.5%, .5)');
+var color = Color.from({r:20, g:30, b:40});
 
 //Per-space
 var color = Color().rgb([10, 20, 30]);

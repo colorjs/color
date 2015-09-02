@@ -339,6 +339,10 @@ describe('Color2 tests', function () {
 		assert.deepEqual(Color('hwb(380deg, 40.1%, -12.5%, .5)').toString(), 'hwb(20, 40%, 0%, 0.5)');
 	});
 
+	it('from', function () {
+		assert.deepEqual(Color.from(Color.parse(Color('rgba(1,2,3,.1)'))).toArray(), [1,2,3]);
+	});
+
 	it.skip('fromNumber', function () {
 		assert.deepEqual(Color().fromNumber(123).rgbArray(), []);
 		assert.deepEqual(Color().fromNumber(123, 'hsl').hslArray(), []);

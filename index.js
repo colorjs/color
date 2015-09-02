@@ -49,7 +49,7 @@ function Color (arg, space) {
 
 
 /** Static parser/stringifier */
-Color.parse = function (cstr) {
+Color.parse = Color.from = function (cstr) {
 	return new Color(cstr);
 };
 
