@@ -2,6 +2,7 @@
 
 A stateful implementation of [harthur/color](http://github.com/harthur/color).
 
+* Immutable.
 * Additional [color spaces](http://github.com/dfcreative/color-space).
 * Standalone [manipulations](http://github.com/dfcreative/color-manipulate).
 * Standalone [metrics](http://github.com/dfcreative/color-measure).
@@ -12,7 +13,7 @@ A stateful implementation of [harthur/color](http://github.com/harthur/color).
 
 ## Usage
 
-```bash
+```sh
 npm install color2
 ```
 
