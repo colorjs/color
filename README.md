@@ -13,9 +13,8 @@ A stateful implementation of [harthur/color](http://github.com/harthur/color).
 
 ## Usage
 
-```sh
-npm install color2
-```
+[![npm install color2](https://nodei.co/npm/color2.png?mini=true)](https://npmjs.org/package/color2/)
+
 
 ```javascript
 var Color = require('color2');
@@ -143,6 +142,3 @@ Please make sure your issue does not belong to a subpackage:
 * [color-measure](http://github.com/dfcreative/color-measure),
 
 and then [contribute](https://github.com/dfcreative/color/issues/new/).
-
-
-[![NPM](https://nodei.co/npm/color2.png?downloads=true&downloadRank=true&stars=true)](https://nodei.co/npm/color2/)
