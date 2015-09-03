@@ -64,7 +64,7 @@ var proto = Color.prototype;
 
 
 /** Universal setter, detecting the type of argument */
-proto.parse = function (arg, space) {
+proto.parse = proto.from = function (arg, space) {
 	var self = this;
 
 	if (!arg) {
