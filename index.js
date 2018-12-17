@@ -497,6 +497,10 @@ proto.opaquer = proto.fadein;
  */
 Object.keys(measure).forEach(function (name) {
 	proto[name] = function (a, b) {
+		
+		// allow color.contrast() to take string args like 'red'
+		if (a && !(a instanceof Color)) a = Color(a)
+
 		return measure[name](this, a, b);
 	};
 });
