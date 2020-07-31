@@ -144,7 +144,7 @@ color.setChannel('lab', 1, 25);
 color.clone();
 ```
 
-
+<!--
 ## Contribute
 
 The goal of the project is to provide fast and extensible color class with intuitive API.
@@ -157,3 +157,8 @@ Please make sure your issue does not belong to a subpackage:
 * [color-measure](http://github.com/dfcreative/color-measure),
 
 and then [contribute](https://github.com/dfcreative/color/issues/new/).
+-->
+
+## Alternatives
+
+* [colorjs](https://github.com/LeaVerou/color.js) by Lea Verou
