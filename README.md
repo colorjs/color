@@ -162,3 +162,4 @@ and then [contribute](https://github.com/dfcreative/color/issues/new/).
 ## Alternatives
 
 * [colorjs](https://github.com/LeaVerou/color.js) by Lea Verou
+* [color2k](https://github.com/ricokahler/color2k)
